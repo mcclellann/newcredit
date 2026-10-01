@@ -1,6 +1,6 @@
 # Application Architecture
 
-**Status:** Approved v1.1
+**Status:** Approved v1.2
 
 **Scope:** Synthetic personal-loan demonstration with a future native iOS client
 
@@ -218,10 +218,13 @@ cloud infrastructure now.
 Drizzle migrations own schema evolution. Seed commands are explicit and may load
 only the repository's synthetic fixtures.
 
-## 9. Proposed UI
+## 9. Approved UI direction
 
 Use a mobile-first, responsive application shell with a clear progress stepper,
 plain Australian English, and persistent save/status feedback.
+
+The visual system, responsive rules, content constraints, and approved reference
+are defined in the [UI design system](ui-design.md).
 
 ### Applicant journey
 
@@ -263,12 +266,13 @@ disbursement events. Operator details must not clutter the applicant screens.
   dark patterns or celebratory language around borrowing.
 - Use charts only as a supplement to labelled values and tables.
 
-## 10. Local Windows and WSL2 deployment
+## 10. Local Windows/WSL2 and macOS deployment
 
-The deployment target is one Windows machine running the application inside a
-WSL2 Linux distribution. The machine does not need an inbound public IP address.
-All remote access, if enabled, arrives through an outbound tunnel or existing
-reverse-proxy service; the provider remains a deployment configuration choice.
+The deployment target is one local machine: either Windows with the application
+inside a WSL2 Linux distribution, or native macOS. Neither target needs an
+inbound public IP address. All remote access, if enabled, arrives through an
+outbound tunnel or existing reverse-proxy service; the provider remains a
+deployment configuration choice.
 
 ```text
                            outbound encrypted connection
@@ -279,9 +283,9 @@ reverse-proxy service; the provider remains a deployment configuration choice.
                               no inbound public IP
                                      │
 ┌────────────────────────────────────▼─────────────────────────────┐
-│ Local Windows host                                               │
+│ Local Windows/WSL2 or macOS host                                │
 │  ┌────────────────────────────────────────────────────────────┐  │
-│  │ WSL2                                                      │  │
+│  │ Linux runtime in WSL2, or native macOS                    │  │
 │  │ reverse proxy ──▶ static web                              │  │
 │  │       │                                                    │  │
 │  │       └──────────▶ Fastify API ──▶ worker ──▶ SQLite/files │  │
@@ -293,25 +297,26 @@ reverse-proxy service; the provider remains a deployment configuration choice.
 
 - Build the React application once and serve its static files from the local
   reverse proxy. Route `/api/*` to Fastify on the same origin.
-- Bind Fastify, health endpoints, and worker control interfaces to WSL loopback;
-  do not bind them directly to a public or LAN interface.
+- Bind Fastify, health endpoints, and worker control interfaces to loopback; do
+  not bind them directly to a public or LAN interface.
 - Accept forwarded scheme and client-address headers only from the trusted local
   proxy. Configure the application with the exact proxy hop count.
 - Terminate external TLS at the trusted proxy/tunnel edge. Keep the tunnel from
-  the Windows host outbound-only so no router port forwarding is required.
+  the local host outbound-only so no router port forwarding is required.
 - Put authentication and access policy at the proxy/tunnel boundary for any
   remote demonstration. The synthetic demo session remains a product simulation,
   not perimeter security.
 - Add unauthenticated liveness and dependency-aware readiness endpoints that
   disclose no customer, document, or configuration data.
-- Run the API and worker as supervised WSL services. A Windows startup task may
-  start WSL and those services after a host reboot; do not depend on an open
-  terminal session.
-- Keep the SQLite database, WAL files, uploads, and active working directory on
-  the WSL ext4 filesystem, not under `/mnt/c`, to preserve SQLite locking and
-  filesystem behaviour.
+- Run the API and worker as supervised services; do not depend on an open
+  terminal session. Use systemd inside WSL2, started through Windows at boot, and
+  launchd on macOS.
+- On WSL2, keep the SQLite database, WAL files, uploads, and active working
+  directory on the Linux ext4 filesystem, not under `/mnt/c`. On macOS, keep
+  runtime data under the user's Application Support directory, not in the Git
+  checkout.
 - Create consistent backups with SQLite's backup mechanism, then copy the closed
-  backup artifact to approved Windows storage. Do not copy a live database file
+  backup artifact to approved host storage. Do not copy a live database file
   without its WAL state.
 - Permit outbound connections only for the configured proxy/tunnel and package
   installation. The running demonstration requires no payment, identity, or
@@ -324,11 +329,14 @@ in client configuration. CORS can therefore remain same-origin by default.
 
 ### Deployment artifacts
 
-Implementation should provide reproducible scripts for build, migration, seed,
-start, stop, status, backup, and restore. Proxy credentials, tunnel identifiers,
-hostnames, database files, uploads, and backups are runtime state and must not be
-committed. The chosen proxy provider and Windows startup mechanism must be
-documented before deployment, but neither changes the API or domain design.
+Implementation should provide the same pnpm commands on macOS and inside WSL2
+for build, migration, seed, start, stop, status, backup, and restore. Avoid
+platform-specific application scripts; isolate systemd and launchd integration
+in deployment assets. Proxy credentials, tunnel identifiers, hostnames, database
+files, uploads, and backups are runtime state and must not be committed. The
+chosen proxy provider and platform startup mechanism must be documented before
+deployment, but neither changes the API or domain design. See
+[Installation and deployment](install-and-deployment.md).
 
 ## 11. Testing and contract quality
 
@@ -362,6 +370,6 @@ OpenAPI—not shared TypeScript types—as the client boundary. Keep calculation
 pure and server-owned, make document work asynchronous, and keep the web client
 as one consumer of a versioned REST API. This gives the demonstration a small
 implementation footprint while leaving a direct path to a generated Swift API
-client and native SwiftUI application. Deploy the system as supervised WSL2
-services behind a same-origin proxy or outbound tunnel; no inbound public IP or
-directly exposed application port is required.
+client and native SwiftUI application. Deploy the system as supervised services
+on Windows/WSL2 or macOS behind a same-origin proxy or outbound tunnel; no
+inbound public IP or directly exposed application port is required.

@@ -219,12 +219,12 @@ The complete flow and record requirements are defined in
   confirmation, submission, offer acceptance, and simulated disbursement.
 - Explain uncertainty and failure; do not label a document "fake" solely from
   an automated signal.
-- Meet an accessibility target to be selected before interface implementation.
+- Meet WCAG 2.2 Level AA for the web interface.
 - Avoid logging document contents or personally identifiable information.
 - Obtain Australian legal and compliance review before presenting any workflow,
   score, or outcome as suitable for real lending.
-- Deploy on one local Windows host through WSL2; no inbound public IP address is
-  required.
+- Support deployment on either a local Windows host through WSL2 or a local
+  macOS host. Neither target requires an inbound public IP address.
 - Expose the application only through the configured reverse proxy or outbound
   tunnel. API, worker, and database ports must not be publicly reachable.
 
@@ -247,7 +247,10 @@ A demonstration is complete when:
 9. synthetic scenarios demonstrate an indicative approval, referral, and
    not-approved outcome with understandable reasons; and
 10. an eligible fixture can accept an offer and complete exactly one simulated
-    disbursement, while blocked and failed scenarios cannot create funds movement.
+    disbursement, while blocked and failed scenarios cannot create funds movement;
+    and
+11. tested installation and service-start instructions work from clean checkouts
+    on both Windows/WSL2 and the supported macOS baseline.
 
 ## 7. Confirmed product decisions
 
@@ -261,8 +264,9 @@ A demonstration is complete when:
    rails or transfers real money.
 8. The living-expense benchmark uses the March 2026 Henderson poverty-line
    amounts excluding housing, converted from weekly to monthly values.
-9. The deployment target is a local Windows machine running WSL2 behind a proxy,
-   without a directly reachable public address.
+9. Supported deployment targets are a local Windows machine running WSL2 and a
+   native macOS machine, each behind a proxy without a directly reachable public
+   address.
 
 ## 8. Decisions still required before implementation
 
