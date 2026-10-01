@@ -1,0 +1,12 @@
+services:
+  api:
+    command: mkdir -p runtime && DATABASE_URL="$PWD/runtime/newcredit.sqlite" HOST=127.0.0.1 pnpm --filter @newcredit/api dev
+    port: 3001
+    health: /health
+  web:
+    command: pnpm --filter @newcredit/web exec vite --host 0.0.0.0 --port "$PORT"
+    health: /
+    agent: control
+    portal:
+      title: NewCredit demo
+      description: Run the Scenario A personal-loan demonstration with synthetic data.

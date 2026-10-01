@@ -1,16 +1,16 @@
 # Installation and Deployment
 
-**Status:** Approved deployment plan v1.0
+**Status:** Scenario A development workflow implemented; production packaging remains planned
 
 **Targets:** Windows 11 with WSL2, and native macOS
 
 ## 1. Current repository status
 
-The repository currently contains requirements, reference data, architecture,
-and design material only. There is no application package to install or run yet.
-The commands in section 4 are the required interface for the implementation;
-they must not be presented as working setup commands until they exist and have
-been tested from a clean checkout on both targets.
+The repository contains a working Scenario A web/API vertical slice. Dependency
+installation, build, tests, SQLite migration, OpenAPI generation, and local
+development commands are implemented and exercised in an Amp Linux orb. Clean
+checkout verification on Windows/WSL2 and native macOS remains required before
+either platform is called a supported packaged deployment.
 
 ## 2. Shared deployment shape
 
@@ -62,15 +62,16 @@ behaviour on macOS and inside WSL2:
 | --- | --- |
 | `corepack enable` | Make the pinned pnpm version available |
 | `pnpm install --frozen-lockfile` | Reproduce dependencies without changing the lockfile |
-| `pnpm build` | Build API, worker, generated client, and static web assets |
+| `pnpm dev` | Start the Fastify API and Vite web client for local development |
+| `pnpm build` | Build the API packages and static web assets |
 | `pnpm db:migrate` | Apply committed SQLite migrations once and safely |
-| `pnpm db:seed:demo` | Idempotently load synthetic demonstration data only |
-| `pnpm start:api` | Start Fastify on configured loopback host and port |
-| `pnpm start:worker` | Start the durable document-processing worker |
-| `pnpm healthcheck` | Verify API readiness without exposing sensitive data |
-| `pnpm backup -- <path>` | Create a consistent SQLite and upload backup |
-| `pnpm restore -- <path>` | Validate and restore an offline backup explicitly |
 | `pnpm test` | Run non-browser automated tests |
+| `pnpm typecheck` | Check all TypeScript packages without emitting output |
+| `pnpm openapi:generate` | Refresh the committed OpenAPI 3.1 contract |
+
+The worker, production start/supervision, seed, healthcheck, backup, and restore
+commands remain part of the later deployment milestone; they are not falsely
+exposed as implemented commands in this slice.
 
 Build, migration, seed, backup, and restore commands must exit non-zero on
 failure. Start commands remain foreground processes so systemd, launchd, or a

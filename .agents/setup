@@ -3,5 +3,6 @@ set -euo pipefail
 
 started_at=$SECONDS
 python3 -m pip install --quiet --disable-pip-version-check -r requirements-docs.txt
-printf '[orb setup] Installed synthetic-document tooling.\n'
+pnpm install --frozen-lockfile
+printf '[orb setup] Installed application and synthetic-document tooling.\n'
 printf '[orb setup] Completed in %ss.\n' "$((SECONDS - started_at))"

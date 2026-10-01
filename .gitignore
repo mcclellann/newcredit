@@ -18,3 +18,9 @@
 # Python document-generation caches
 __pycache__/
 *.py[cod]
+
+# Node and local runtime state
+node_modules/
+dist/
+coverage/
+/runtime/

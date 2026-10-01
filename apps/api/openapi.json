@@ -1,0 +1,1667 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "NewCredit Scenario A API",
+    "version": "1.0.0"
+  },
+  "components": {
+    "schemas": {}
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "system"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "ok"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/demo-scenarios": {
+      "get": {
+        "tags": [
+          "demo"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "scenarios"
+                  ],
+                  "properties": {
+                    "scenarios": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "name",
+                          "description"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "enum": [
+                              "scenario-a"
+                            ]
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/demo-sessions": {
+      "post": {
+        "tags": [
+          "demo"
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "createdAt"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/applications": {
+      "post": {
+        "tags": [
+          "applications"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "scenarioId"
+                ],
+                "properties": {
+                  "scenarioId": {
+                    "type": "string",
+                    "enum": [
+                      "scenario-a"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "scenarioId",
+                    "status",
+                    "version",
+                    "fixedDemonstrationDate",
+                    "customer",
+                    "loan",
+                    "documents",
+                    "review"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "scenarioId": {
+                      "type": "string",
+                      "enum": [
+                        "scenario-a"
+                      ]
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "ready_to_submit"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "submitted"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "offer_accepted"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "funded"
+                          ]
+                        }
+                      ]
+                    },
+                    "version": {
+                      "type": "integer"
+                    },
+                    "fixedDemonstrationDate": {
+                      "type": "string"
+                    },
+                    "customer": {
+                      "type": "object",
+                      "required": [
+                        "type",
+                        "name",
+                        "dateOfBirth",
+                        "email",
+                        "phone",
+                        "address",
+                        "employer"
+                      ],
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "new"
+                          ]
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "dateOfBirth": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "phone": {
+                          "type": "string"
+                        },
+                        "address": {
+                          "type": "string"
+                        },
+                        "employer": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "loan": {
+                      "type": "object",
+                      "required": [
+                        "amount",
+                        "termYears",
+                        "purpose",
+                        "purposeDetail"
+                      ],
+                      "properties": {
+                        "amount": {
+                          "type": "object",
+                          "required": [
+                            "amountMinor",
+                            "currency"
+                          ],
+                          "properties": {
+                            "amountMinor": {
+                              "type": "integer"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "enum": [
+                                "AUD"
+                              ]
+                            }
+                          }
+                        },
+                        "termYears": {
+                          "type": "integer"
+                        },
+                        "purpose": {
+                          "type": "string"
+                        },
+                        "purposeDetail": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "documents": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "type",
+                          "issuer",
+                          "periodStart",
+                          "periodEnd",
+                          "status"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "enum": [
+                                  "bank_statement"
+                                ]
+                              },
+                              {
+                                "type": "string",
+                                "enum": [
+                                  "drivers_licence"
+                                ]
+                              },
+                              {
+                                "type": "string",
+                                "enum": [
+                                  "payslip"
+                                ]
+                              }
+                            ]
+                          },
+                          "issuer": {
+                            "type": "string"
+                          },
+                          "periodStart": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "periodEnd": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "processed"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "review": {
+                      "type": "object",
+                      "required": [
+                        "monthlyNetIncome",
+                        "assessedLivingExpenses",
+                        "monthlyHousing",
+                        "classifiedTransactionCount",
+                        "documentChecksPassed"
+                      ],
+                      "properties": {
+                        "monthlyNetIncome": {
+                          "type": "object",
+                          "required": [
+                            "amountMinor",
+                            "currency"
+                          ],
+                          "properties": {
+                            "amountMinor": {
+                              "type": "integer"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "enum": [
+                                "AUD"
+                              ]
+                            }
+                          }
+                        },
+                        "assessedLivingExpenses": {
+                          "type": "object",
+                          "required": [
+                            "amountMinor",
+                            "currency"
+                          ],
+                          "properties": {
+                            "amountMinor": {
+                              "type": "integer"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "enum": [
+                                "AUD"
+                              ]
+                            }
+                          }
+                        },
+                        "monthlyHousing": {
+                          "type": "object",
+                          "required": [
+                            "amountMinor",
+                            "currency"
+                          ],
+                          "properties": {
+                            "amountMinor": {
+                              "type": "integer"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "enum": [
+                                "AUD"
+                              ]
+                            }
+                          }
+                        },
+                        "classifiedTransactionCount": {
+                          "type": "integer"
+                        },
+                        "documentChecksPassed": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/applications/{id}": {
+      "get": {
+        "tags": [
+          "applications"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "scenarioId",
+                    "status",
+                    "version",
+                    "fixedDemonstrationDate",
+                    "customer",
+                    "loan",
+                    "documents",
+                    "review"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "scenarioId": {
+                      "type": "string",
+                      "enum": [
+                        "scenario-a"
+                      ]
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "ready_to_submit"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "submitted"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "offer_accepted"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "funded"
+                          ]
+                        }
+                      ]
+                    },
+                    "version": {
+                      "type": "integer"
+                    },
+                    "fixedDemonstrationDate": {
+                      "type": "string"
+                    },
+                    "customer": {
+                      "type": "object",
+                      "required": [
+                        "type",
+                        "name",
+                        "dateOfBirth",
+                        "email",
+                        "phone",
+                        "address",
+                        "employer"
+                      ],
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "new"
+                          ]
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "dateOfBirth": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "phone": {
+                          "type": "string"
+                        },
+                        "address": {
+                          "type": "string"
+                        },
+                        "employer": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "loan": {
+                      "type": "object",
+                      "required": [
+                        "amount",
+                        "termYears",
+                        "purpose",
+                        "purposeDetail"
+                      ],
+                      "properties": {
+                        "amount": {
+                          "type": "object",
+                          "required": [
+                            "amountMinor",
+                            "currency"
+                          ],
+                          "properties": {
+                            "amountMinor": {
+                              "type": "integer"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "enum": [
+                                "AUD"
+                              ]
+                            }
+                          }
+                        },
+                        "termYears": {
+                          "type": "integer"
+                        },
+                        "purpose": {
+                          "type": "string"
+                        },
+                        "purposeDetail": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "documents": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "type",
+                          "issuer",
+                          "periodStart",
+                          "periodEnd",
+                          "status"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "enum": [
+                                  "bank_statement"
+                                ]
+                              },
+                              {
+                                "type": "string",
+                                "enum": [
+                                  "drivers_licence"
+                                ]
+                              },
+                              {
+                                "type": "string",
+                                "enum": [
+                                  "payslip"
+                                ]
+                              }
+                            ]
+                          },
+                          "issuer": {
+                            "type": "string"
+                          },
+                          "periodStart": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "periodEnd": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "processed"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "review": {
+                      "type": "object",
+                      "required": [
+                        "monthlyNetIncome",
+                        "assessedLivingExpenses",
+                        "monthlyHousing",
+                        "classifiedTransactionCount",
+                        "documentChecksPassed"
+                      ],
+                      "properties": {
+                        "monthlyNetIncome": {
+                          "type": "object",
+                          "required": [
+                            "amountMinor",
+                            "currency"
+                          ],
+                          "properties": {
+                            "amountMinor": {
+                              "type": "integer"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "enum": [
+                                "AUD"
+                              ]
+                            }
+                          }
+                        },
+                        "assessedLivingExpenses": {
+                          "type": "object",
+                          "required": [
+                            "amountMinor",
+                            "currency"
+                          ],
+                          "properties": {
+                            "amountMinor": {
+                              "type": "integer"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "enum": [
+                                "AUD"
+                              ]
+                            }
+                          }
+                        },
+                        "monthlyHousing": {
+                          "type": "object",
+                          "required": [
+                            "amountMinor",
+                            "currency"
+                          ],
+                          "properties": {
+                            "amountMinor": {
+                              "type": "integer"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "enum": [
+                                "AUD"
+                              ]
+                            }
+                          }
+                        },
+                        "classifiedTransactionCount": {
+                          "type": "integer"
+                        },
+                        "documentChecksPassed": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/applications/{id}/submission": {
+      "post": {
+        "tags": [
+          "applications"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "confirmation"
+                ],
+                "properties": {
+                  "confirmation": {
+                    "type": "boolean",
+                    "enum": [
+                      true
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "scenarioId",
+                    "status",
+                    "version",
+                    "fixedDemonstrationDate",
+                    "customer",
+                    "loan",
+                    "documents",
+                    "review"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "scenarioId": {
+                      "type": "string",
+                      "enum": [
+                        "scenario-a"
+                      ]
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "ready_to_submit"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "submitted"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "offer_accepted"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "funded"
+                          ]
+                        }
+                      ]
+                    },
+                    "version": {
+                      "type": "integer"
+                    },
+                    "fixedDemonstrationDate": {
+                      "type": "string"
+                    },
+                    "customer": {
+                      "type": "object",
+                      "required": [
+                        "type",
+                        "name",
+                        "dateOfBirth",
+                        "email",
+                        "phone",
+                        "address",
+                        "employer"
+                      ],
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "new"
+                          ]
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "dateOfBirth": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "phone": {
+                          "type": "string"
+                        },
+                        "address": {
+                          "type": "string"
+                        },
+                        "employer": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "loan": {
+                      "type": "object",
+                      "required": [
+                        "amount",
+                        "termYears",
+                        "purpose",
+                        "purposeDetail"
+                      ],
+                      "properties": {
+                        "amount": {
+                          "type": "object",
+                          "required": [
+                            "amountMinor",
+                            "currency"
+                          ],
+                          "properties": {
+                            "amountMinor": {
+                              "type": "integer"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "enum": [
+                                "AUD"
+                              ]
+                            }
+                          }
+                        },
+                        "termYears": {
+                          "type": "integer"
+                        },
+                        "purpose": {
+                          "type": "string"
+                        },
+                        "purposeDetail": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "documents": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "type",
+                          "issuer",
+                          "periodStart",
+                          "periodEnd",
+                          "status"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "enum": [
+                                  "bank_statement"
+                                ]
+                              },
+                              {
+                                "type": "string",
+                                "enum": [
+                                  "drivers_licence"
+                                ]
+                              },
+                              {
+                                "type": "string",
+                                "enum": [
+                                  "payslip"
+                                ]
+                              }
+                            ]
+                          },
+                          "issuer": {
+                            "type": "string"
+                          },
+                          "periodStart": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "periodEnd": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "processed"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "review": {
+                      "type": "object",
+                      "required": [
+                        "monthlyNetIncome",
+                        "assessedLivingExpenses",
+                        "monthlyHousing",
+                        "classifiedTransactionCount",
+                        "documentChecksPassed"
+                      ],
+                      "properties": {
+                        "monthlyNetIncome": {
+                          "type": "object",
+                          "required": [
+                            "amountMinor",
+                            "currency"
+                          ],
+                          "properties": {
+                            "amountMinor": {
+                              "type": "integer"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "enum": [
+                                "AUD"
+                              ]
+                            }
+                          }
+                        },
+                        "assessedLivingExpenses": {
+                          "type": "object",
+                          "required": [
+                            "amountMinor",
+                            "currency"
+                          ],
+                          "properties": {
+                            "amountMinor": {
+                              "type": "integer"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "enum": [
+                                "AUD"
+                              ]
+                            }
+                          }
+                        },
+                        "monthlyHousing": {
+                          "type": "object",
+                          "required": [
+                            "amountMinor",
+                            "currency"
+                          ],
+                          "properties": {
+                            "amountMinor": {
+                              "type": "integer"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "enum": [
+                                "AUD"
+                              ]
+                            }
+                          }
+                        },
+                        "classifiedTransactionCount": {
+                          "type": "integer"
+                        },
+                        "documentChecksPassed": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/applications/{id}/outcome": {
+      "get": {
+        "tags": [
+          "applications"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "applicationId",
+                    "decision",
+                    "riskScore",
+                    "riskBand",
+                    "affordability",
+                    "monthlySurplus",
+                    "reasons",
+                    "illustrativeNotOffer"
+                  ],
+                  "properties": {
+                    "applicationId": {
+                      "type": "string"
+                    },
+                    "decision": {
+                      "type": "string",
+                      "enum": [
+                        "indicatively_approved"
+                      ]
+                    },
+                    "riskScore": {
+                      "type": "integer"
+                    },
+                    "riskBand": {
+                      "type": "string",
+                      "enum": [
+                        "very_low"
+                      ]
+                    },
+                    "affordability": {
+                      "type": "string",
+                      "enum": [
+                        "affordable"
+                      ]
+                    },
+                    "monthlySurplus": {
+                      "type": "object",
+                      "required": [
+                        "amountMinor",
+                        "currency"
+                      ],
+                      "properties": {
+                        "amountMinor": {
+                          "type": "integer"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "AUD"
+                          ]
+                        }
+                      }
+                    },
+                    "reasons": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "illustrativeNotOffer": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/applications/{id}/offer": {
+      "get": {
+        "tags": [
+          "offers"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "applicationId",
+                    "principal",
+                    "termYears",
+                    "annualRateBasisPoints",
+                    "monthlyFee",
+                    "monthlyRepayment",
+                    "totalRepayable",
+                    "status",
+                    "destinationAccountMasked",
+                    "simulationNotice"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "applicationId": {
+                      "type": "string"
+                    },
+                    "principal": {
+                      "type": "object",
+                      "required": [
+                        "amountMinor",
+                        "currency"
+                      ],
+                      "properties": {
+                        "amountMinor": {
+                          "type": "integer"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "AUD"
+                          ]
+                        }
+                      }
+                    },
+                    "termYears": {
+                      "type": "integer"
+                    },
+                    "annualRateBasisPoints": {
+                      "type": "integer"
+                    },
+                    "monthlyFee": {
+                      "type": "object",
+                      "required": [
+                        "amountMinor",
+                        "currency"
+                      ],
+                      "properties": {
+                        "amountMinor": {
+                          "type": "integer"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "AUD"
+                          ]
+                        }
+                      }
+                    },
+                    "monthlyRepayment": {
+                      "type": "object",
+                      "required": [
+                        "amountMinor",
+                        "currency"
+                      ],
+                      "properties": {
+                        "amountMinor": {
+                          "type": "integer"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "AUD"
+                          ]
+                        }
+                      }
+                    },
+                    "totalRepayable": {
+                      "type": "object",
+                      "required": [
+                        "amountMinor",
+                        "currency"
+                      ],
+                      "properties": {
+                        "amountMinor": {
+                          "type": "integer"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "AUD"
+                          ]
+                        }
+                      }
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "ready"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "accepted"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "funded"
+                          ]
+                        }
+                      ]
+                    },
+                    "destinationAccountMasked": {
+                      "type": "string"
+                    },
+                    "simulationNotice": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/offers/{id}/acceptance": {
+      "post": {
+        "tags": [
+          "offers"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "applicationId",
+                    "principal",
+                    "termYears",
+                    "annualRateBasisPoints",
+                    "monthlyFee",
+                    "monthlyRepayment",
+                    "totalRepayable",
+                    "status",
+                    "destinationAccountMasked",
+                    "simulationNotice"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "applicationId": {
+                      "type": "string"
+                    },
+                    "principal": {
+                      "type": "object",
+                      "required": [
+                        "amountMinor",
+                        "currency"
+                      ],
+                      "properties": {
+                        "amountMinor": {
+                          "type": "integer"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "AUD"
+                          ]
+                        }
+                      }
+                    },
+                    "termYears": {
+                      "type": "integer"
+                    },
+                    "annualRateBasisPoints": {
+                      "type": "integer"
+                    },
+                    "monthlyFee": {
+                      "type": "object",
+                      "required": [
+                        "amountMinor",
+                        "currency"
+                      ],
+                      "properties": {
+                        "amountMinor": {
+                          "type": "integer"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "AUD"
+                          ]
+                        }
+                      }
+                    },
+                    "monthlyRepayment": {
+                      "type": "object",
+                      "required": [
+                        "amountMinor",
+                        "currency"
+                      ],
+                      "properties": {
+                        "amountMinor": {
+                          "type": "integer"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "AUD"
+                          ]
+                        }
+                      }
+                    },
+                    "totalRepayable": {
+                      "type": "object",
+                      "required": [
+                        "amountMinor",
+                        "currency"
+                      ],
+                      "properties": {
+                        "amountMinor": {
+                          "type": "integer"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "AUD"
+                          ]
+                        }
+                      }
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "ready"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "accepted"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "funded"
+                          ]
+                        }
+                      ]
+                    },
+                    "destinationAccountMasked": {
+                      "type": "string"
+                    },
+                    "simulationNotice": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/offers/{id}/disbursement": {
+      "post": {
+        "tags": [
+          "disbursements"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "type": "string"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "offerId",
+                    "amount",
+                    "status",
+                    "transferReference",
+                    "destinationAccountMasked",
+                    "simulationNotice"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "offerId": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "type": "object",
+                      "required": [
+                        "amountMinor",
+                        "currency"
+                      ],
+                      "properties": {
+                        "amountMinor": {
+                          "type": "integer"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "AUD"
+                          ]
+                        }
+                      }
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "completed"
+                      ]
+                    },
+                    "transferReference": {
+                      "type": "string"
+                    },
+                    "destinationAccountMasked": {
+                      "type": "string"
+                    },
+                    "simulationNotice": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/disbursements/{id}": {
+      "get": {
+        "tags": [
+          "disbursements"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "offerId",
+                    "amount",
+                    "status",
+                    "transferReference",
+                    "destinationAccountMasked",
+                    "simulationNotice"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "offerId": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "type": "object",
+                      "required": [
+                        "amountMinor",
+                        "currency"
+                      ],
+                      "properties": {
+                        "amountMinor": {
+                          "type": "integer"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "AUD"
+                          ]
+                        }
+                      }
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "completed"
+                      ]
+                    },
+                    "transferReference": {
+                      "type": "string"
+                    },
+                    "destinationAccountMasked": {
+                      "type": "string"
+                    },
+                    "simulationNotice": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
