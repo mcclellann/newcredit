@@ -1,0 +1,9 @@
+scenario_id,customer_id,customer_type,state_or_territory,summary,expected_processing_outcome,expected_risk_band,expected_pricing_tier,expected_credit_outcome,expected_disbursement_outcome
+A,CUST-SYN-001,new,NSW,"Complete documents, regular salary, stable positive cash flow",ready,very_low,tier_1,indicatively_approved,completed
+B,CUST-SYN-002,existing,VIC,"Pre-populated details, variable income, recurring liabilities",ready,moderate,tier_3,referred,not_eligible_referred
+C,CUST-SYN-003,new,QLD,"Missing statement period and unreadable licence field",needs_review,not_scored,not_available,outcome_withheld,not_eligible_review
+D,CUST-SYN-004,existing,SA,"Duplicate statement page and cross-document income conflict",needs_review,not_scored,not_available,outcome_withheld,not_eligible_review
+E,CUST-SYN-005,new,WA,"Internal transfers and refunds that must not inflate income",ready,low,tier_2,indicatively_approved,completed_after_retry
+F,CUST-SYN-006,existing,TAS,"Ambiguous merchants, cash transactions, and unknown labels",ready,elevated,tier_3,referred,not_eligible_referred
+G,CUST-SYN-007,new,ACT,"Suspicious alteration signals requiring review",needs_review,not_scored,not_available,outcome_withheld,not_eligible_review
+H,CUST-SYN-008,existing,NT,"Complete documents, sustained negative cash flow, and high debt servicing",ready,high,no_offer,not_approved,not_eligible_declined
