@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+started_at=$SECONDS
+printf '[orb setup] No toolchain or dependencies are declared; nothing to install.\n'
+printf '[orb setup] Completed in %ss.\n' "$((SECONDS - started_at))"
