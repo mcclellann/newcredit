@@ -1,6 +1,7 @@
-# Application Architecture Proposal
+# Application Architecture
 
-**Status:** Approved v1.0  
+**Status:** Approved v1.1
+
 **Scope:** Synthetic personal-loan demonstration with a future native iOS client
 
 ## 1. Recommendation
@@ -262,7 +263,74 @@ disbursement events. Operator details must not clutter the applicant screens.
   dark patterns or celebratory language around borrowing.
 - Use charts only as a supplement to labelled values and tables.
 
-## 10. Testing and contract quality
+## 10. Local Windows and WSL2 deployment
+
+The deployment target is one Windows machine running the application inside a
+WSL2 Linux distribution. The machine does not need an inbound public IP address.
+All remote access, if enabled, arrives through an outbound tunnel or existing
+reverse-proxy service; the provider remains a deployment configuration choice.
+
+```text
+                           outbound encrypted connection
+┌────────────────┐        ┌──────────────────────┐
+│ Browser / iOS  │───────▶│ Proxy or tunnel edge│
+└────────────────┘        └──────────┬───────────┘
+                                     │
+                              no inbound public IP
+                                     │
+┌────────────────────────────────────▼─────────────────────────────┐
+│ Local Windows host                                               │
+│  ┌────────────────────────────────────────────────────────────┐  │
+│  │ WSL2                                                      │  │
+│  │ reverse proxy ──▶ static web                              │  │
+│  │       │                                                    │  │
+│  │       └──────────▶ Fastify API ──▶ worker ──▶ SQLite/files │  │
+│  └────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Runtime rules
+
+- Build the React application once and serve its static files from the local
+  reverse proxy. Route `/api/*` to Fastify on the same origin.
+- Bind Fastify, health endpoints, and worker control interfaces to WSL loopback;
+  do not bind them directly to a public or LAN interface.
+- Accept forwarded scheme and client-address headers only from the trusted local
+  proxy. Configure the application with the exact proxy hop count.
+- Terminate external TLS at the trusted proxy/tunnel edge. Keep the tunnel from
+  the Windows host outbound-only so no router port forwarding is required.
+- Put authentication and access policy at the proxy/tunnel boundary for any
+  remote demonstration. The synthetic demo session remains a product simulation,
+  not perimeter security.
+- Add unauthenticated liveness and dependency-aware readiness endpoints that
+  disclose no customer, document, or configuration data.
+- Run the API and worker as supervised WSL services. A Windows startup task may
+  start WSL and those services after a host reboot; do not depend on an open
+  terminal session.
+- Keep the SQLite database, WAL files, uploads, and active working directory on
+  the WSL ext4 filesystem, not under `/mnt/c`, to preserve SQLite locking and
+  filesystem behaviour.
+- Create consistent backups with SQLite's backup mechanism, then copy the closed
+  backup artifact to approved Windows storage. Do not copy a live database file
+  without its WAL state.
+- Permit outbound connections only for the configured proxy/tunnel and package
+  installation. The running demonstration requires no payment, identity, or
+  document-analysis network integration.
+
+The reverse proxy or tunnel hostname is the application's configured public
+origin, even when it is private to an access-controlled audience. Web API calls
+use relative `/api/v1` URLs so no WSL, localhost, or machine IP address appears
+in client configuration. CORS can therefore remain same-origin by default.
+
+### Deployment artifacts
+
+Implementation should provide reproducible scripts for build, migration, seed,
+start, stop, status, backup, and restore. Proxy credentials, tunnel identifiers,
+hostnames, database files, uploads, and backups are runtime state and must not be
+committed. The chosen proxy provider and Windows startup mechanism must be
+documented before deployment, but neither changes the API or domain design.
+
+## 11. Testing and contract quality
 
 - Unit-test pure calculations and state transitions with the independently
   authored expected fixture values.
@@ -278,7 +346,7 @@ disbursement events. Operator details must not clutter the applicant screens.
 - Use Playwright for the new-customer, existing-customer, review, referral,
   decline, and successful/retried disbursement journeys.
 
-## 11. Deliberate exclusions
+## 12. Deliberate exclusions
 
 The initial implementation does not need Next.js, server-side rendering,
 GraphQL, tRPC, microservices, Kubernetes, Redis, a cloud object store, real OCR,
@@ -287,11 +355,13 @@ These would add operational or client coupling without improving the synthetic
 demonstration. External document-analysis providers can later implement the same
 internal processing interface without changing the public API.
 
-## 12. Decision summary
+## 13. Decision summary
 
 Adopt TypeScript, React/Vite, Fastify/TypeBox/OpenAPI, and SQLite/Drizzle. Treat
 OpenAPI—not shared TypeScript types—as the client boundary. Keep calculations
 pure and server-owned, make document work asynchronous, and keep the web client
 as one consumer of a versioned REST API. This gives the demonstration a small
 implementation footprint while leaving a direct path to a generated Swift API
-client and native SwiftUI application.
+client and native SwiftUI application. Deploy the system as supervised WSL2
+services behind a same-origin proxy or outbound tunnel; no inbound public IP or
+directly exposed application port is required.

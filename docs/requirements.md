@@ -223,6 +223,10 @@ The complete flow and record requirements are defined in
 - Avoid logging document contents or personally identifiable information.
 - Obtain Australian legal and compliance review before presenting any workflow,
   score, or outcome as suitable for real lending.
+- Deploy on one local Windows host through WSL2; no inbound public IP address is
+  required.
+- Expose the application only through the configured reverse proxy or outbound
+  tunnel. API, worker, and database ports must not be publicly reachable.
 
 ## 6. Initial acceptance criteria
 
@@ -257,6 +261,8 @@ A demonstration is complete when:
    rails or transfers real money.
 8. The living-expense benchmark uses the March 2026 Henderson poverty-line
    amounts excluding housing, converted from weekly to monthly values.
+9. The deployment target is a local Windows machine running WSL2 behind a proxy,
+   without a directly reachable public address.
 
 ## 8. Decisions still required before implementation
 
