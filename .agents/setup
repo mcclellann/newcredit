@@ -2,5 +2,6 @@
 set -euo pipefail
 
 started_at=$SECONDS
-printf '[orb setup] No toolchain or dependencies are declared; nothing to install.\n'
+python3 -m pip install --quiet --disable-pip-version-check -r requirements-docs.txt
+printf '[orb setup] Installed synthetic-document tooling.\n'
 printf '[orb setup] Completed in %ss.\n' "$((SECONDS - started_at))"

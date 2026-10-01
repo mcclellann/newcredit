@@ -30,8 +30,11 @@ A fixture cannot be marked review-complete without this declaration.
 - Use generated IDs with `SYN` or fixture-specific prefixes.
 - Use `example.com` email domains and Australian fictional phone ranges reserved
   for creative works where available.
-- Use clearly fictional street and employer names; do not combine details that
-  plausibly identify a real person.
+- Use clearly fictional street names and do not combine details that plausibly
+  identify a real person. A real organisation name may be used only as visual
+  context in a fixture that prominently says it is synthetic, unofficial, and
+  not issued or endorsed by that organisation; never copy its document, logo,
+  identifiers, contact details, or security features.
 - Generate licence and account identifiers; display only masked account values.
 - Strip creator names, local paths, geolocation, and device metadata from
   generated PDF and image fixtures.

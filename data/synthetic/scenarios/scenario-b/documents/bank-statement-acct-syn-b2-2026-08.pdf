@@ -1,8 +1,8 @@
-%PDF-1.3
+%PDF-1.4
 %“Œ‹ž ReportLab Generated PDF document (opensource)
 1 0 obj
 <<
-/F1 2 0 R
+/F1 2 0 R /F2 3 0 R
 >>
 endobj
 2 0 obj
@@ -12,7 +12,12 @@ endobj
 endobj
 3 0 obj
 <<
-/Contents 7 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 6 0 R /Resources <<
+/BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Name /F2 /Subtype /Type1 /Type /Font
+>>
+endobj
+4 0 obj
+<<
+/Contents 8 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 7 0 R /Resources <<
 /Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
 >> /Rotate 0 /Trans <<
 
@@ -20,49 +25,50 @@ endobj
   /Type /Page
 >>
 endobj
-4 0 obj
-<<
-/PageMode /UseNone /Pages 6 0 R /Type /Catalog
->>
-endobj
 5 0 obj
 <<
-/Author () /CreationDate (D:20000101000000+00'00') /Creator () /Keywords () /ModDate (D:20000101000000+00'00') /Producer () 
-  /Subject (Fictional NewCredit fixture) /Title (Synthetic demonstration data) /Trapped /False
+/PageMode /UseNone /Pages 7 0 R /Type /Catalog
 >>
 endobj
 6 0 obj
 <<
-/Count 1 /Kids [ 3 0 R ] /Type /Pages
+/Author (NewCredit synthetic fixture generator) /CreationDate (D:20000101000000+00'00') /Creator (NewCredit synthetic fixture generator) /Keywords () /ModDate (D:20000101000000+00'00') /Producer (ReportLab PDF Library - \(opensource\)) 
+  /Subject (Deliberately synthetic test fixture) /Title (Synthetic demonstration document \204 not valid) /Trapped /False
 >>
 endobj
 7 0 obj
 <<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 430
+/Count 1 /Kids [ 4 0 R ] /Type /Pages
+>>
+endobj
+8 0 obj
+<<
+/Filter [ /ASCII85Decode /FlateDecode ] /Length 1415
 >>
 stream
-Garo>?Z1NM'ZJu.'^'I?!c,u/h[iUdJ/Y?s-GCn6NC@8Qp9;IG^P[ZBg!]L>V`j40gRD(P\S,'&4YRImSl/AhnHu:s3^eolN9!"t[H[m\A#d!)fF[r*m\iV<V\_S*cLi>fVBQF:jM;?>T&q5<7Dr."Y&LXTbX0GU>\&C)_rol##u^:!nH&/*e),<F?FEjbA%QX%I9F$u4\mI=X%_.L^^)_2@LjWk.%7?N*FhMil[#$YeUVpjW1*+`O"#aVD$HiaJ\s^q\uOYl=mspa;1][s9#tt"Ps7Pu/'XtXL2"X@bd/^;ZR(uM3:a@7PhW4'1F"Y.FUp>/!SYun_P:(<Q>o\e:Y:sP8^QZA6.>iZaP$:j08s@)%e:S_?fXMo@imMPrHs,nr=6uk%Fj^T5PFK^5Gt;60%/K3a."O6UueerkQ`r_RSa~>endstream
+Gau0CD0+E#&H8h>Yob`b2D\4u?+Q'u"K'"u/'43*-=9_@[])Qg+O]E0G>B?&i["_g4#Se%dQRKoF*i7\'F=]ck.?u_oJ61qUd,f.pHXE_+IbW`3Ia+)>V.5K^A6<4_=GFAE0a:blhb@]>.VqA$CHKX$2<m.fCK0D!aMIe-R?4O-X8Sd)a=aQj+b)Ced\)4Q4ZPAj2;1pac1ph%_nf`;0E[dj$!mglSqMC,fmuF"J;[V5nmrc:=Is:!51H"+:3Z,oRc::qm[N&UChk\-F_s;OSo@946-'ZLEO2U//K1%l#";t$9Y"@mQCT&D'Pg1TG7\9B`_/P!l=[FnN<Xk@79/Ta1&$:@#O%a)""=j'Lc:NOG"<0'GHI[i=\k`<Yu+k!a!aFb"(E-RZ60_*S$W&]#T$YfeTa3Gu7?R($%fg=B@A]lF\b4AQA1tVu+tLXp?XE\E;[>WjY#NrhO0Ym:*a[b4i7,;[KMn<W-%NdfO.WpVj^uqo'2Bnt5oer%bCJ/m%_QHFPMLdOYtlN8,s>[2.pd:.@MPBlJJV$-rge#=R2S#h*@J=*;'T?oZsJM#j]8"8sbNV26Ki56!YoiDXX.0]tG>jH?=t\.q.r/\lQ.i+oln0"tR)SH0u7%ZF3iedoP%;t-46(Z-)_AZ<&5>;,B[LGn<JV5QMi6SePQrOga8"5"C\;*O)b*bf=$#]&3RIJ%Y&<=[__X6/3"\.tKZpM?=mc#^/.=Z.^Oqj,%YPT@q*kmD'9C\RSI[X#$=grsT^V/F[b%]uR@=LOum_gSV\eoP`fEQ__JE/W+[1YOU%1"r"2*=CuW0r=m!FuN't>\TMJ4'$MM!@=h9(>je-WR/=d&k)]fU+Q@se&8b)<ar^M(jK[L]f6)5p-QQ9.D1:QoNL#h#9EAeOB3XPp\!F*O)MAV@a>R\a"HA:fF)VYI=Dm-s$QK:I_+c2p=&1U^1Zs6kDlQHp8,3toH;5lis,]F:YdtI[%E:q9FGt%7+$=17W4e;Iof/_>J!$Nr?NAQRNSk#R!%^g3$Q&f'N8t!`j*,7Dpq0&UJ6@erGCekS'necc6,9N.QsQ,@f+3riGilV_5M2q@'^`I__?XM&mrON1;46]42C]n:C4%,C^@TpLRZmrPk-+Ue3U3O<&(9bjW:"=Y/YLZGD]#G;7%@XL8)Oce:3=L2SsD&36GWn`;MAMQ,$k(Lct,7Va$k`GD<V(6f-@T^S6J,,"B84BZLZ?lsG`"K1VH-E#%9-iDhuX^aP3Jko!W@Uc29NKWL^^LNW*FXL'K.[:MLL%+$(<@b?!ac+Rjq4M>#d0<^sT\q1pi2gom6K5$$`L3d]+/nC%<FCe`;m\g*9CV8Cbjt!AGn0\:q"TuL#ZZYMUC>$-JmHK<<gd>(0bB8#o*KL0@DNf$\9>(X$+hep,JQdN=q%*+QEfp~>endstream
 endobj
 xref
-0 8
+0 9
 0000000000 65535 f 
 0000000061 00000 n 
-0000000092 00000 n 
-0000000199 00000 n 
-0000000402 00000 n 
-0000000470 00000 n 
-0000000711 00000 n 
-0000000770 00000 n 
+0000000102 00000 n 
+0000000209 00000 n 
+0000000321 00000 n 
+0000000524 00000 n 
+0000000592 00000 n 
+0000000972 00000 n 
+0000001031 00000 n 
 trailer
 <<
 /ID 
-[<8d94f036b01a27967bed8eb927b24517><8d94f036b01a27967bed8eb927b24517>]
+[<d84a924ad4fb3924d140bcdf9e0b3a05><d84a924ad4fb3924d140bcdf9e0b3a05>]
 % ReportLab generated PDF document -- digest (opensource)
 
-/Info 5 0 R
-/Root 4 0 R
-/Size 8
+/Info 6 0 R
+/Root 5 0 R
+/Size 9
 >>
 startxref
-1290
+2537
 %%EOF

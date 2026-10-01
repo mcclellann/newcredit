@@ -19,6 +19,11 @@ during the statement period. Generated source documents must be internally
 consistent with their canonical records except where the scenario deliberately
 tests a documented discrepancy.
 
+Run `python3 scripts/generate-synthetic-documents.py` from the repository root to
+rebuild every PDF and refresh its SHA-256 manifest value. The generator requires
+the packages in `requirements-docs.txt`. Document layouts are source-like but
+original, visibly synthetic, and contain no copied logos or security features.
+
 The scenario manifest defines the first eight customer packs. Scenario A and B
 are the owner-approved implementation baseline; remaining packs follow after the
 first vertical slice validates the fixture contract.
