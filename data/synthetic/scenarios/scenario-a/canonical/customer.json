@@ -1,0 +1,24 @@
+{
+  "customer_id": "CUST-SYN-001",
+  "customer_type": "new",
+  "legal_name": {
+    "display": "Avery Example",
+    "given": "Avery",
+    "family": "Example"
+  },
+  "date_of_birth": "1991-04-17",
+  "email": "avery.example@example.com",
+  "phone": "0491 570 101",
+  "residential_address": {
+    "line1": "17 Wattle Fiction Way",
+    "suburb": "Example Park",
+    "state": "NSW",
+    "postcode": "2000",
+    "country": "AU",
+    "fictional": true
+  },
+  "licence_number": "NSW-SYN-A7K4Q9",
+  "licence_display": "••••A7K4Q9",
+  "licence_expiry": "2029-04-17",
+  "existing_customer_reference": null
+}

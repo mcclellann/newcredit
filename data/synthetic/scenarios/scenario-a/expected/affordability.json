@@ -1,0 +1,49 @@
+{
+  "methodology_version": "affordability-v0.1",
+  "benchmark": {
+    "version": "dleb-2026q1-v1",
+    "selected_row": {
+      "workforce_status": "in_workforce",
+      "household_type": "single_person",
+      "dependant_count": 0
+    },
+    "weekly": "472.92",
+    "monthly": "2049.32",
+    "verified_comparable_actual": "1865.89",
+    "adopted": "2049.32",
+    "lookup_rationale": "Single, no dependants, applicant in workforce; verified comparable actual is the three-month average of non-housing general-living debits ((1731.05 + 1866.72 + 1999.91) / 3 = 1865.89), and the benchmark exceeds it."
+  },
+  "assessment_rate": {
+    "nominal_annual_rate": "0.19",
+    "principal_and_interest_repayment": "733.12",
+    "monthly_fee": "15.00",
+    "scheduled_monthly_obligation": "748.12",
+    "stressed_proposed_repayment": "897.74",
+    "verified_net_income": "6500.00",
+    "assessed_general_living_expenses": "2049.32",
+    "housing": "1400.00",
+    "existing_debt_repayments": "0.00",
+    "other_fixed_commitments": "0.00",
+    "assessed_outgoings_before_proposed_loan": "3449.32",
+    "post_loan_surplus": "2152.94",
+    "surplus_ratio": "0.331222",
+    "result": "affordable"
+  },
+  "offered_rate": {
+    "nominal_annual_rate": "0.12",
+    "principal_and_interest_repayment": "664.29",
+    "monthly_fee": "15.00",
+    "scheduled_monthly_obligation": "679.29",
+    "stressed_proposed_repayment": "815.15",
+    "verified_net_income": "6500.00",
+    "assessed_general_living_expenses": "2049.32",
+    "housing": "1400.00",
+    "existing_debt_repayments": "0.00",
+    "other_fixed_commitments": "0.00",
+    "assessed_outgoings_before_proposed_loan": "3449.32",
+    "post_loan_surplus": "2235.53",
+    "surplus_ratio": "0.343928",
+    "result": "affordable"
+  },
+  "rounding": "Decimal, full precision amortization then half-up cents per displayed step"
+}

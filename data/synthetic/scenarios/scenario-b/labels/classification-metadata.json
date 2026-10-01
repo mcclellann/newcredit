@@ -1,0 +1,23 @@
+{
+  "taxonomy_version": "approved-initial-v1",
+  "authorship": "Labels were independently authored from future implementation.",
+  "allowed_categories": [
+    "expense.debt_repayment",
+    "expense.discretionary",
+    "expense.dishonour_fee",
+    "expense.gambling",
+    "expense.groceries",
+    "expense.healthcare",
+    "expense.housing",
+    "expense.insurance",
+    "expense.other",
+    "expense.short_term_credit_repayment",
+    "expense.transport",
+    "expense.utilities",
+    "income.salary",
+    "transfer.internal"
+  ],
+  "joint_account_policy": "All rows retained; applicant confirmed 40% expense share used only in affordability derivation.",
+  "risk_relevant_second_review": "approved",
+  "review_status": "approved"
+}

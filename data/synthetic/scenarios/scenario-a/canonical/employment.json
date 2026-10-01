@@ -1,0 +1,14 @@
+{
+  "employment_id": "EMP-SYN-A",
+  "application_id": "APP-SYN-A",
+  "employer": "Blue Gum Demonstration Works Pty Ltd (fictional)",
+  "employment_status": "permanent_full_time",
+  "pay_frequency": "fortnightly",
+  "gross_pay": "3900.00",
+  "net_pay": "3000.00",
+  "regular_income_monthly": "6500.00",
+  "other_income_monthly": "0.00",
+  "continuing_confirmed": true,
+  "source": "payslips_and_transactions",
+  "verification_status": "verified"
+}

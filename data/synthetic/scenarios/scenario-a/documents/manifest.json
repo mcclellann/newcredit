@@ -1,0 +1,101 @@
+{
+  "fixed_demonstration_date": "2026-10-01",
+  "documents": [
+    {
+      "document_id": "DOC-SYN-A-STMT-07",
+      "document_type": "bank_statement",
+      "file": "documents/bank-statement-2026-07.pdf",
+      "stated_issuer": "Southern Example Mutual (fictional)",
+      "period_start": "2026-07-01",
+      "period_end": "2026-07-31",
+      "page_count": 1,
+      "content_hash": "sha256:9fa67427271f0d9ab47302e334e9a03cc5c5f8e869eb11fab41cde9759ff80f8",
+      "processing_status": "processed",
+      "synthetic_notice_visible": true
+    },
+    {
+      "document_id": "DOC-SYN-A-STMT-08",
+      "document_type": "bank_statement",
+      "file": "documents/bank-statement-2026-08.pdf",
+      "stated_issuer": "Southern Example Mutual (fictional)",
+      "period_start": "2026-08-01",
+      "period_end": "2026-08-31",
+      "page_count": 1,
+      "content_hash": "sha256:6c6ecc5006d98c063c8708492459b1220ccd7287d66bbc9214b18cb61eac85f8",
+      "processing_status": "processed",
+      "synthetic_notice_visible": true
+    },
+    {
+      "document_id": "DOC-SYN-A-STMT-09",
+      "document_type": "bank_statement",
+      "file": "documents/bank-statement-2026-09.pdf",
+      "stated_issuer": "Southern Example Mutual (fictional)",
+      "period_start": "2026-09-01",
+      "period_end": "2026-09-30",
+      "page_count": 1,
+      "content_hash": "sha256:34e80c526d6183387032efda1d1b0699ed12a4e36765e942ee2798cf6d1ce119",
+      "processing_status": "processed",
+      "synthetic_notice_visible": true
+    },
+    {
+      "document_id": "DOC-SYN-A-LIC",
+      "document_type": "drivers_licence",
+      "file": "documents/drivers-licence.pdf",
+      "stated_issuer": "NSW Synthetic Licence Demonstrator",
+      "period_start": null,
+      "period_end": null,
+      "page_count": 1,
+      "content_hash": "sha256:4117a9440af14c8e518d24ab01c0a088ae233e6791496f9c762464304fe0f6aa",
+      "processing_status": "processed",
+      "synthetic_notice_visible": true
+    },
+    {
+      "document_id": "DOC-SYN-A-PAY-16",
+      "document_type": "payslip",
+      "file": "documents/payslip-2026-08-07.pdf",
+      "stated_issuer": "Blue Gum Demonstration Works Pty Ltd (fictional)",
+      "period_start": "2026-08-07",
+      "period_end": "2026-08-07",
+      "page_count": 1,
+      "content_hash": "sha256:79674fe8477b66bf59ff956d4fad4f9c5abaf7cd6ad5b08983961314b092e351",
+      "processing_status": "processed",
+      "synthetic_notice_visible": true
+    },
+    {
+      "document_id": "DOC-SYN-A-PAY-17",
+      "document_type": "payslip",
+      "file": "documents/payslip-2026-08-21.pdf",
+      "stated_issuer": "Blue Gum Demonstration Works Pty Ltd (fictional)",
+      "period_start": "2026-08-21",
+      "period_end": "2026-08-21",
+      "page_count": 1,
+      "content_hash": "sha256:46b235c6dc1da6a3b648dc74f45c36aaba9ac3a2178f987a35865f1f6defd4db",
+      "processing_status": "processed",
+      "synthetic_notice_visible": true
+    },
+    {
+      "document_id": "DOC-SYN-A-PAY-18",
+      "document_type": "payslip",
+      "file": "documents/payslip-2026-09-04.pdf",
+      "stated_issuer": "Blue Gum Demonstration Works Pty Ltd (fictional)",
+      "period_start": "2026-09-04",
+      "period_end": "2026-09-04",
+      "page_count": 1,
+      "content_hash": "sha256:b444917ed27e0235309040ad5438146c6fd82080ccd5b5f4d1b5ecab76080c55",
+      "processing_status": "processed",
+      "synthetic_notice_visible": true
+    },
+    {
+      "document_id": "DOC-SYN-A-PAY-19",
+      "document_type": "payslip",
+      "file": "documents/payslip-2026-09-18.pdf",
+      "stated_issuer": "Blue Gum Demonstration Works Pty Ltd (fictional)",
+      "period_start": "2026-09-18",
+      "period_end": "2026-09-18",
+      "page_count": 1,
+      "content_hash": "sha256:70075140bb813ad54e31054e601ff466c827965d5baa1c575c235c119c74e21d",
+      "processing_status": "processed",
+      "synthetic_notice_visible": true
+    }
+  ]
+}

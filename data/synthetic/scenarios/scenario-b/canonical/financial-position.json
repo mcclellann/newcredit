@@ -1,0 +1,86 @@
+{
+  "application_id": "APP-SYN-B",
+  "entries": [
+    {
+      "id": "FP-B-IN",
+      "kind": "income",
+      "subtype": "salary",
+      "description": "Variable but continuing verified salary, three-month average",
+      "amount": "6166.67",
+      "currency": "AUD",
+      "frequency": "monthly",
+      "normalized_monthly": "6166.67",
+      "effective_date": "2026-10-01",
+      "source": "document",
+      "verification_status": "verified"
+    },
+    {
+      "id": "FP-B-H",
+      "kind": "expense",
+      "subtype": "housing",
+      "description": "Rent",
+      "amount": "1200.00",
+      "currency": "AUD",
+      "frequency": "monthly",
+      "normalized_monthly": "1200.00",
+      "effective_date": "2026-10-01",
+      "source": "transaction",
+      "verification_status": "verified"
+    },
+    {
+      "id": "FP-B-G",
+      "kind": "expense",
+      "subtype": "general_living",
+      "description": "Comparable general living, including 40% confirmed joint share",
+      "amount": "1983.33",
+      "currency": "AUD",
+      "frequency": "monthly",
+      "normalized_monthly": "1983.33",
+      "effective_date": "2026-10-01",
+      "source": "transaction",
+      "verification_status": "verified"
+    },
+    {
+      "id": "FP-B-L1",
+      "kind": "liability",
+      "subtype": "personal_loan",
+      "description": "Fictional consolidation loan",
+      "creditor": "Example Lending Ledger (fictional)",
+      "outstanding_balance": "18437.29",
+      "amount": "1650.00",
+      "currency": "AUD",
+      "frequency": "monthly",
+      "normalized_monthly": "1650.00",
+      "effective_date": "2026-10-01",
+      "source": "customer_record_and_transaction",
+      "verification_status": "verified"
+    },
+    {
+      "id": "FP-B-L2",
+      "kind": "liability",
+      "subtype": "short_term_credit",
+      "description": "Fictional short-term facilities",
+      "creditor": "Synthetic Advance Desk",
+      "outstanding_balance": "912.48",
+      "amount": "450.00",
+      "currency": "AUD",
+      "frequency": "monthly",
+      "normalized_monthly": "450.00",
+      "effective_date": "2026-10-01",
+      "source": "customer_record_and_transaction",
+      "verification_status": "verified"
+    },
+    {
+      "id": "FP-B-AS",
+      "kind": "asset",
+      "subtype": "cash",
+      "description": "Combined closing account balances",
+      "amount": "5003.47",
+      "currency": "AUD",
+      "frequency": null,
+      "effective_date": "2026-09-30",
+      "source": "document",
+      "verification_status": "verified"
+    }
+  ]
+}

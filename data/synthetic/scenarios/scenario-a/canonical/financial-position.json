@@ -1,0 +1,56 @@
+{
+  "application_id": "APP-SYN-A",
+  "entries": [
+    {
+      "id": "FP-A-IN",
+      "kind": "income",
+      "subtype": "salary",
+      "description": "Verified regular net salary",
+      "amount": "3000.00",
+      "currency": "AUD",
+      "frequency": "fortnightly",
+      "normalized_monthly": "6500.00",
+      "effective_date": "2026-10-01",
+      "source": "document",
+      "verification_status": "verified"
+    },
+    {
+      "id": "FP-A-H",
+      "kind": "expense",
+      "subtype": "housing",
+      "description": "Rent",
+      "amount": "1400.00",
+      "currency": "AUD",
+      "frequency": "monthly",
+      "normalized_monthly": "1400.00",
+      "effective_date": "2026-10-01",
+      "source": "transaction",
+      "verification_status": "verified"
+    },
+    {
+      "id": "FP-A-G",
+      "kind": "expense",
+      "subtype": "general_living",
+      "description": "Comparable actual living costs",
+      "amount": "1865.89",
+      "currency": "AUD",
+      "frequency": "monthly",
+      "normalized_monthly": "1865.89",
+      "effective_date": "2026-10-01",
+      "source": "transaction",
+      "verification_status": "verified"
+    },
+    {
+      "id": "FP-A-AS",
+      "kind": "asset",
+      "subtype": "cash",
+      "description": "Closing transaction-account balance",
+      "amount": "10633.49",
+      "currency": "AUD",
+      "frequency": null,
+      "effective_date": "2026-09-30",
+      "source": "document",
+      "verification_status": "verified"
+    }
+  ]
+}

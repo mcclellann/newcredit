@@ -1,0 +1,71 @@
+{
+  "method": "independently total normalized labelled rows; paired transfers excluded from consolidated cash flow; all joint rows preserved",
+  "summaries": [
+    {
+      "month": "2026-07",
+      "account_id": "ACCT-SYN-B1",
+      "opening_balance": "2864.47",
+      "credits": "6100.00",
+      "debits": "5240.00",
+      "closing_balance": "3724.47",
+      "net_cash_flow": "860.00",
+      "internal_transfers_excluded": "400.00",
+      "applicant_share": "1.00"
+    },
+    {
+      "month": "2026-07",
+      "account_id": "ACCT-SYN-B2",
+      "opening_balance": "224.00",
+      "credits": "400.00",
+      "debits": "370.00",
+      "closing_balance": "254.00",
+      "net_cash_flow": "30.00",
+      "internal_transfers_excluded": "400.00",
+      "applicant_share": "0.40"
+    },
+    {
+      "month": "2026-08",
+      "account_id": "ACCT-SYN-B1",
+      "opening_balance": "3724.47",
+      "credits": "6000.00",
+      "debits": "5800.00",
+      "closing_balance": "3924.47",
+      "net_cash_flow": "200.00",
+      "internal_transfers_excluded": "400.00",
+      "applicant_share": "1.00"
+    },
+    {
+      "month": "2026-08",
+      "account_id": "ACCT-SYN-B2",
+      "opening_balance": "254.00",
+      "credits": "400.00",
+      "debits": "450.00",
+      "closing_balance": "204.00",
+      "net_cash_flow": "-50.00",
+      "internal_transfers_excluded": "400.00",
+      "applicant_share": "0.40"
+    },
+    {
+      "month": "2026-09",
+      "account_id": "ACCT-SYN-B1",
+      "opening_balance": "3924.47",
+      "credits": "6400.00",
+      "debits": "5520.00",
+      "closing_balance": "4804.47",
+      "net_cash_flow": "880.00",
+      "internal_transfers_excluded": "400.00",
+      "applicant_share": "1.00"
+    },
+    {
+      "month": "2026-09",
+      "account_id": "ACCT-SYN-B2",
+      "opening_balance": "204.00",
+      "credits": "400.00",
+      "debits": "405.00",
+      "closing_balance": "199.00",
+      "net_cash_flow": "-5.00",
+      "internal_transfers_excluded": "400.00",
+      "applicant_share": "0.40"
+    }
+  ]
+}

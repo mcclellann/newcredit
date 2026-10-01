@@ -1,0 +1,136 @@
+{
+  "audit_events": [
+    {
+      "sequence": 1,
+      "event_id": "AUD-SYN-A-001",
+      "type": "synthetic_consent_recorded",
+      "at": "2026-10-01T09:00:00+10:00"
+    },
+    {
+      "sequence": 2,
+      "event_id": "AUD-SYN-A-002",
+      "type": "documents_uploaded",
+      "at": "2026-10-01T09:10:00+10:00"
+    },
+    {
+      "sequence": 3,
+      "event_id": "AUD-SYN-A-003",
+      "type": "extraction_completed",
+      "at": "2026-10-01T09:12:00+10:00"
+    },
+    {
+      "sequence": 4,
+      "event_id": "AUD-SYN-A-004",
+      "type": "document_checks_passed",
+      "at": "2026-10-01T09:13:00+10:00"
+    },
+    {
+      "sequence": 5,
+      "event_id": "AUD-SYN-A-005",
+      "type": "applicant_confirmed",
+      "at": "2026-10-01T10:20:00+10:00"
+    },
+    {
+      "sequence": 6,
+      "event_id": "AUD-SYN-A-006",
+      "type": "application_submitted",
+      "at": "2026-10-01T10:21:00+10:00"
+    },
+    {
+      "sequence": 7,
+      "event_id": "AUD-SYN-A-007",
+      "type": "risk_scored",
+      "at": "2026-10-01T10:21:05+10:00"
+    },
+    {
+      "sequence": 8,
+      "event_id": "AUD-SYN-A-008",
+      "type": "offer_presented",
+      "at": "2026-10-01T10:22:00+10:00"
+    },
+    {
+      "sequence": 9,
+      "event_id": "AUD-SYN-A-009",
+      "type": "simulation_disclaimer_acknowledged",
+      "at": "2026-10-01T10:23:00+10:00"
+    },
+    {
+      "sequence": 10,
+      "event_id": "AUD-SYN-A-010",
+      "type": "offer_accepted",
+      "at": "2026-10-01T10:24:00+10:00"
+    },
+    {
+      "sequence": 11,
+      "event_id": "AUD-SYN-A-011",
+      "type": "destination_confirmed",
+      "at": "2026-10-01T10:24:30+10:00"
+    },
+    {
+      "sequence": 12,
+      "event_id": "AUD-SYN-A-012",
+      "type": "disbursement_processing_started",
+      "at": "2026-10-01T10:25:00+10:00"
+    },
+    {
+      "sequence": 13,
+      "event_id": "AUD-SYN-A-013",
+      "type": "disbursement_completed",
+      "at": "2026-10-01T10:25:05+10:00"
+    }
+  ],
+  "offer": {
+    "offer_id": "OFFER-SYN-A-001",
+    "application_id": "APP-SYN-A",
+    "principal": "20000.00",
+    "term_years": 3,
+    "pricing_tier": "tier_1",
+    "nominal_annual_rate": "0.12",
+    "monthly_fee": "15.00",
+    "repayment_frequency": "monthly",
+    "principal_and_interest_repayment": "664.29",
+    "scheduled_monthly_obligation": "679.29",
+    "number_of_repayments": 36,
+    "total_fees": "540.00",
+    "total_repayable": "24454.44",
+    "accepted_at": "2026-10-01T10:24:00+10:00",
+    "methodology_versions": {
+      "affordability": "affordability-v0.1",
+      "score": "credit-risk-v0.1",
+      "pricing": "pricing-v0.1"
+    },
+    "simulation_notice": "Simulation only—no money was transferred"
+  },
+  "disbursements": [
+    {
+      "disbursement_id": "DISB-SYN-A-001",
+      "offer_id": "OFFER-SYN-A-001",
+      "idempotency_key": "SIM-IDEMP-OFFER-SYN-A-001",
+      "destination_account_id": "ACCT-SYN-A1",
+      "destination_bsb_masked": "•••-901",
+      "destination_account_masked": "••••1847",
+      "amount": "20000.00",
+      "currency": "AUD",
+      "status": "completed",
+      "failure_reason": null,
+      "transfer_reference": "SIM-A-20261001-001",
+      "attempts": 1,
+      "completed_at": "2026-10-01T10:25:05+10:00",
+      "simulation_notice": "Simulation only—no money was transferred"
+    }
+  ],
+  "ledger": [
+    {
+      "entry_id": "LED-SYN-A-DR",
+      "account": "synthetic_loan_receivable",
+      "debit": "20000.00",
+      "credit": "0.00"
+    },
+    {
+      "entry_id": "LED-SYN-A-CR",
+      "account": "synthetic_cash_outflow",
+      "debit": "0.00",
+      "credit": "20000.00"
+    }
+  ]
+}

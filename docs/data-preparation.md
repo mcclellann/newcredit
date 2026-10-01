@@ -1,8 +1,9 @@
 # Data Preparation Specification
 
-**Status:** Draft v0.2  
-**Constraint:** Use only synthetic or demonstrably de-identified data during
-development and demonstration.
+**Status:** Approved v1.0
+
+**Constraint:** Use only deliberately authored synthetic data during development
+and demonstration.
 
 ## 1. Preparation goals
 
@@ -13,6 +14,8 @@ future implementation so fixtures can detect incorrect behavior.
 
 No source documents or records containing real personal, bank, licence, or
 payroll information should be committed to the repository.
+The mandatory controls are defined in the
+[Synthetic Data and Repository Safety Policy](synthetic-data-policy.md).
 
 The fixed demonstration date is **1 October 2026**. Therefore:
 
@@ -56,7 +59,7 @@ those identifiers rather than names, licence numbers, or account numbers.
 | `customer_id` | generated ID | Stable; contains no meaning |
 | `customer_type` | enum | `new`, `existing` |
 | `legal_name` | structured text | Synthetic; preserve displayed and normalized forms |
-| `date_of_birth` | date | Synthetic; future age rules are product decisions |
+| `date_of_birth` | date | Synthetic; applicant must be at least 18 on the demonstration date |
 | `email`, `phone` | text | Reserved example domains/numbers only |
 | `residential_address` | structured address | Fictional and jurisdiction-specific |
 | `licence_number` | sensitive text | New customer only; synthetic and masked in displays |
@@ -74,7 +77,7 @@ those identifiers rather than names, licence numbers, or account numbers.
 | --- | --- | --- |
 | `requested_amount` | decimal | AUD 5,000–100,000 inclusive |
 | `requested_term_years` | integer | One of 1, 2, 3, 4, or 5 |
-| `loan_purpose` | enum and text | Specific purpose; vocabulary remains to be approved |
+| `loan_purpose` | enum and text | `debt_consolidation`, `vehicle`, `home_improvements`, `medical_dental`, `education`, `major_purchase`, or `other` with explanation |
 | `assessment_rate` | decimal | 19% nominal annual rate for initial score calculation |
 | `offered_rate` | decimal or null | 12%, 15.5%, or 19% from the pricing tier |
 | `monthly_fee` | decimal | AUD 15 |
@@ -128,6 +131,34 @@ Do not combine recurring flow amounts and point-in-time balances. Preserve the
 original frequency, then calculate a separately labelled normalized monthly
 amount using one agreed conversion table.
 
+### Approved frequency normalization
+
+| Source frequency | Monthly conversion |
+| --- | ---: |
+| Weekly | amount × 52 ÷ 12 |
+| Fortnightly | amount × 26 ÷ 12 |
+| Four-weekly | amount × 13 ÷ 12 |
+| Monthly | amount |
+| Quarterly | amount ÷ 3 |
+| Annual | amount ÷ 12 |
+
+Keep full decimal precision during calculation and round the final monthly value
+to cents using half-up rounding. Irregular or unsupported frequencies require an
+explicit authored monthly expectation and review; do not infer a recurrence from
+one transaction.
+
+### Approved account coverage rules
+
+- Include every account with transaction activity during the statement window.
+- Preserve every transaction from a joint account and record ownership plus the
+  applicant's confirmed income and expense share separately.
+- Include an account opened or closed during the window with its true available
+  dates; explained partial coverage does not itself fail completeness.
+- Pair confirmed internal transfers across supplied accounts and exclude both
+  sides from income and expense totals.
+- Do not assume an unpaired transfer, cash withdrawal, or merchant name proves
+  the purpose of funds.
+
 ## 4. Normalized transaction schema
 
 | Field | Type | Rules |
@@ -169,16 +200,21 @@ The initial mutually exclusive top-level categories are:
 - `expense.healthcare`
 - `expense.education_childcare`
 - `expense.debt_repayment`
+- `expense.bnpl_repayment`
+- `expense.short_term_credit_repayment`
 - `expense.child_support`
 - `expense.gambling`
 - `expense.cash_withdrawal`
 - `expense.bank_fee`
+- `expense.dishonour_fee`
+- `expense.overdraft_fee`
 - `expense.discretionary`
 - `expense.other`
 - `refund`
 - `unknown`
 
-Taxonomy rules must define ambiguous cases before labels are produced. In
+This taxonomy is approved for the initial fixtures. Labelling rules must define
+ambiguous cases before labels are produced. In
 particular, distinguish salary from other credits, debt repayments from ordinary
 transfers, refunds from income, and internal transfers from genuine cash flow.
 Merchant details may support classification but must not be treated as proof of
@@ -270,7 +306,11 @@ internal-transfer double counting.
 
 Implementation should not begin until:
 
-1. the taxonomy and financial normalization rules are approved;
-2. scenario A and B source records and expected outputs are reviewed; and
-3. the repository has an explicit policy preventing real sensitive documents
-   from being committed.
+1. ~~the taxonomy and financial normalization rules are approved~~ — completed;
+2. ~~scenario A and B source records and expected outputs are reviewed~~ —
+   completed; and
+3. ~~the repository has an explicit policy preventing real sensitive documents
+   from being committed~~ — completed.
+
+All data-readiness gates were completed on 1 October 2026. The fixture set is
+ready to drive implementation and tests.

@@ -1,0 +1,9 @@
+{
+  "application_id": "APP-SYN-A",
+  "household_type": "single",
+  "adult_count": 1,
+  "dependant_count": 0,
+  "benchmark_workforce_status": "in_workforce",
+  "housing_status": "renting",
+  "shared_expense_share": "1.00"
+}

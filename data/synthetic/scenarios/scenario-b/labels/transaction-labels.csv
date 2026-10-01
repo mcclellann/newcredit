@@ -1,0 +1,55 @@
+transaction_id,category,confidence,method,annotator_rationale,ambiguity_flag,allowed_alternative,second_review_required,review_status
+TXN-SYN-B-005,expense.housing,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,false,approved
+TXN-SYN-B-001,income.salary,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-B-006,expense.debt_repayment,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,false,approved
+TXN-SYN-B-007,expense.short_term_credit_repayment,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,true,approved
+TXN-SYN-B-009,expense.groceries,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,false,approved
+TXN-SYN-B-002,income.salary,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-B-010,expense.utilities,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,false,approved
+TXN-SYN-B-011,expense.transport,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,false,approved
+TXN-SYN-B-003,income.salary,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-B-012,expense.insurance,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,false,approved
+TXN-SYN-B-008,expense.short_term_credit_repayment,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,true,approved
+TXN-SYN-B-013,expense.gambling,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,true,approved
+TXN-SYN-B-004,income.salary,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-B-014,expense.dishonour_fee,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,true,approved
+TXN-SYN-B-015,expense.discretionary,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,false,approved
+TXN-SYN-B-016,transfer.internal,0.99,independent-human-label-v1,Matched equal transfer across supplied accounts,false,,false,approved
+TXN-SYN-B-018,expense.groceries,0.99,independent-human-label-v1,Joint account row preserved; affordability uses confirmed 40% share,false,,false,approved
+TXN-SYN-B-019,expense.utilities,0.99,independent-human-label-v1,Joint account row preserved; affordability uses confirmed 40% share,false,,false,approved
+TXN-SYN-B-017,transfer.internal,0.99,independent-human-label-v1,Matched equal transfer across supplied accounts,false,,false,approved
+TXN-SYN-B-024,expense.housing,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,false,approved
+TXN-SYN-B-025,expense.debt_repayment,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,false,approved
+TXN-SYN-B-026,expense.short_term_credit_repayment,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,true,approved
+TXN-SYN-B-020,income.salary,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-B-027,expense.groceries,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,false,approved
+TXN-SYN-B-028,expense.utilities,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,false,approved
+TXN-SYN-B-021,income.salary,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-B-029,expense.transport,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,false,approved
+TXN-SYN-B-030,expense.insurance,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,false,approved
+TXN-SYN-B-031,expense.dishonour_fee,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,true,approved
+TXN-SYN-B-022,income.salary,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-B-032,expense.discretionary,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,false,approved
+TXN-SYN-B-033,expense.healthcare,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,false,approved
+TXN-SYN-B-023,income.salary,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-B-034,transfer.internal,0.99,independent-human-label-v1,Matched equal transfer across supplied accounts,false,,false,approved
+TXN-SYN-B-036,expense.groceries,0.99,independent-human-label-v1,Joint account row preserved; affordability uses confirmed 40% share,false,,false,approved
+TXN-SYN-B-037,expense.other,0.99,independent-human-label-v1,Joint account row preserved; affordability uses confirmed 40% share,false,,false,approved
+TXN-SYN-B-035,transfer.internal,0.99,independent-human-label-v1,Matched equal transfer across supplied accounts,false,,false,approved
+TXN-SYN-B-042,expense.housing,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,false,approved
+TXN-SYN-B-038,income.salary,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-B-043,expense.debt_repayment,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,false,approved
+TXN-SYN-B-044,expense.short_term_credit_repayment,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,true,approved
+TXN-SYN-B-045,expense.groceries,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,false,approved
+TXN-SYN-B-039,income.salary,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-B-046,expense.utilities,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,false,approved
+TXN-SYN-B-047,expense.transport,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,false,approved
+TXN-SYN-B-040,income.salary,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-B-048,expense.insurance,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,false,approved
+TXN-SYN-B-049,expense.discretionary,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,false,approved
+TXN-SYN-B-041,income.salary,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-B-050,expense.healthcare,0.99,independent-human-label-v1,Source description and recurring pattern support label,false,,false,approved
+TXN-SYN-B-051,transfer.internal,0.99,independent-human-label-v1,Matched equal transfer across supplied accounts,false,,false,approved
+TXN-SYN-B-053,expense.groceries,0.99,independent-human-label-v1,Joint account row preserved; affordability uses confirmed 40% share,false,,false,approved
+TXN-SYN-B-054,expense.utilities,0.99,independent-human-label-v1,Joint account row preserved; affordability uses confirmed 40% share,false,,false,approved
+TXN-SYN-B-052,transfer.internal,0.99,independent-human-label-v1,Matched equal transfer across supplied accounts,false,,false,approved

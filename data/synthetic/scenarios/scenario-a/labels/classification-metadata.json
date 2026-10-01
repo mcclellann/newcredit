@@ -1,0 +1,18 @@
+{
+  "taxonomy_version": "approved-initial-v1",
+  "authorship": "Labels were authored independently from future application classification logic.",
+  "allowed_categories": [
+    "expense.discretionary",
+    "expense.groceries",
+    "expense.healthcare",
+    "expense.housing",
+    "expense.insurance",
+    "expense.other",
+    "expense.transport",
+    "expense.utilities",
+    "income.salary"
+  ],
+  "confidence_scale": "0 to 1",
+  "ambiguity_policy": "Ambiguous rows require alternative and second review.",
+  "review_status": "approved"
+}

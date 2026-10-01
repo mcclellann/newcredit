@@ -1,1 +1,16 @@
 .amp/portals/*
+
+# Local application state and sensitive runtime inputs
+.env
+.env.*
+!.env.example
+/runtime/
+/uploads/
+/backups/
+/data/private/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal

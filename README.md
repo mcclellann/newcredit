@@ -1,8 +1,9 @@
 # newcredit
 A demonstration of a simplified personal-loan application process.
 
-The project is currently in requirements and data-preparation discovery. No
-application implementation has started.
+Requirements, data preparation, architecture, UI, and the initial synthetic
+fixtures are approved. The repository is ready for application implementation;
+no application code has started yet.
 
 - [Product requirements](docs/requirements.md)
 - [Data preparation](docs/data-preparation.md)

@@ -1,0 +1,18 @@
+{
+  "application_id": "APP-SYN-B",
+  "customer_id": "CUST-SYN-002",
+  "status": "submitted",
+  "requested_amount": "10000.00",
+  "requested_term_years": 5,
+  "loan_purpose": "debt_consolidation",
+  "purpose_detail": "Consolidate synthetic recurring liabilities",
+  "assessment_rate": "0.19",
+  "offered_rate": "0.19",
+  "monthly_fee": "15.00",
+  "serviceability_buffer": "0.20",
+  "applicant_confirmation": {
+    "confirmed": true,
+    "at": "2026-10-01T11:20:00+10:00"
+  },
+  "synthetic_demo_consent": true
+}

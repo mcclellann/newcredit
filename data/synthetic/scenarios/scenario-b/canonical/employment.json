@@ -1,0 +1,17 @@
+{
+  "employment_id": "EMP-SYN-B",
+  "application_id": "APP-SYN-B",
+  "employer": "Copper Kite Example Services Pty Ltd (fictional)",
+  "employment_status": "permanent_part_time_variable_hours",
+  "pay_frequency": "weekly",
+  "gross_pay": "variable",
+  "net_pay": "variable",
+  "observed_net_pay_august": "6000.00",
+  "observed_net_pay_september": "6400.00",
+  "verified_net_income_monthly": "6166.67",
+  "continuing_confirmed": true,
+  "income_variation_method": "(maximum weekly pay - minimum weekly pay) / mean weekly pay across required payslips",
+  "income_variation": "0.322581",
+  "source": "payslips_and_transactions",
+  "verification_status": "verified"
+}

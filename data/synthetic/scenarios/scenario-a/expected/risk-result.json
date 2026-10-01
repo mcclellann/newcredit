@@ -1,0 +1,73 @@
+{
+  "score_version": "credit-risk-v0.1",
+  "input_period": {
+    "start": "2026-07-01",
+    "end": "2026-09-30"
+  },
+  "frozen_at_assessment_rate": "0.19",
+  "factors": [
+    {
+      "factor": "post_loan_capacity",
+      "raw": "assessment surplus ratio >=20%",
+      "risk_value": 0,
+      "weight": "0.25",
+      "weighted_value": "0.00"
+    },
+    {
+      "factor": "payment_stress",
+      "raw": "0 events",
+      "risk_value": 0,
+      "weight": "0.20",
+      "weighted_value": "0.00"
+    },
+    {
+      "factor": "existing_debt_burden",
+      "raw": "0.00%",
+      "risk_value": 0,
+      "weight": "0.15",
+      "weighted_value": "0.00"
+    },
+    {
+      "factor": "cash_flow_balance_stability",
+      "raw": "positive cash flow each month; 0 negative-balance days",
+      "risk_value": 0,
+      "weight": "0.15",
+      "weighted_value": "0.00"
+    },
+    {
+      "factor": "income_stability",
+      "raw": "0.00% pay-cycle variation; continuing",
+      "risk_value": 0,
+      "weight": "0.10",
+      "weighted_value": "0.00"
+    },
+    {
+      "factor": "gambling_activity",
+      "raw": "0 events, 0.00%",
+      "risk_value": 0,
+      "weight": "0.10",
+      "weighted_value": "0.00"
+    },
+    {
+      "factor": "short_term_credit_use",
+      "raw": "0 events",
+      "risk_value": 0,
+      "weight": "0.05",
+      "weighted_value": "0.00"
+    }
+  ],
+  "composite_risk": "0.00",
+  "score_formula": "round(1 + 9.99 * 0.00)",
+  "score": 1,
+  "band": "very_low",
+  "pricing_tier": "tier_1",
+  "offered_rate": "0.12",
+  "affordability": "affordable",
+  "outcome": "indicatively_approved",
+  "reason_codes": [
+    "AFFORDABLE_STRONG_SURPLUS",
+    "STABLE_POSITIVE_CASH_FLOW",
+    "NO_OBSERVED_STRESS"
+  ],
+  "illustrative_not_offer": true
+}

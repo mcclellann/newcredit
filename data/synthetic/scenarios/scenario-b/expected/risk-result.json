@@ -1,0 +1,83 @@
+{
+  "score_version": "credit-risk-v0.1",
+  "input_period": {
+    "start": "2026-07-01",
+    "end": "2026-09-30"
+  },
+  "frozen_at_assessment_rate": "0.19",
+  "factors": [
+    {
+      "factor": "post_loan_capacity",
+      "raw": "assessment surplus ratio 7.9119%",
+      "risk_value": 50,
+      "weight": "0.25",
+      "weighted_value": "12.50"
+    },
+    {
+      "factor": "payment_stress",
+      "raw": "2 dishonour/payment-stress events",
+      "risk_value": 50,
+      "weight": "0.20",
+      "weighted_value": "10.00"
+    },
+    {
+      "factor": "existing_debt_burden",
+      "raw": "2100.00 / 6166.67 = 34.0540%",
+      "risk_value": 75,
+      "weight": "0.15",
+      "weighted_value": "11.25"
+    },
+    {
+      "factor": "cash_flow_balance_stability",
+      "raw": "positive consolidated external cash flow each month; 0 negative-balance days",
+      "risk_value": 0,
+      "weight": "0.15",
+      "weighted_value": "0.00"
+    },
+    {
+      "factor": "income_stability",
+      "raw": "32.2581% required-payslip range variation; continuing",
+      "risk_value": 75,
+      "weight": "0.10",
+      "weighted_value": "7.50"
+    },
+    {
+      "factor": "gambling_activity",
+      "raw": "1 event; 45.00 / 6166.67 = 0.7297%",
+      "risk_value": 25,
+      "weight": "0.10",
+      "weighted_value": "2.50"
+    },
+    {
+      "factor": "short_term_credit_use",
+      "raw": "4 repayment events",
+      "risk_value": 100,
+      "weight": "0.05",
+      "weighted_value": "5.00"
+    }
+  ],
+  "composite_risk": "48.75",
+  "score_formula": "round(1 + 9.99 * 48.75)",
+  "score": 488,
+  "band": "moderate",
+  "pricing_tier": "tier_3",
+  "offered_rate": "0.19",
+  "affordability": "affordable",
+  "outcome": "referred",
+  "reason_codes": [
+    "MODERATE_RISK_SCORE",
+    "RECURRING_DEBT_BURDEN",
+    "VARIABLE_CONTINUING_INCOME",
+    "PAYMENT_STRESS_OBSERVED"
+  ],
+  "principal_adverse_factors": [
+    "short_term_credit_use",
+    "income_stability",
+    "existing_debt_burden"
+  ],
+  "material_positive_factors": [
+    "income_continuing",
+    "affordability_positive"
+  ],
+  "illustrative_not_offer": true
+}

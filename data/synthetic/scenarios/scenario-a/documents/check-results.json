@@ -1,0 +1,53 @@
+{
+  "check_version": "document-check-fixture-v1",
+  "results": [
+    {
+      "document_id": "DOC-SYN-A-STMT-07",
+      "check": "statement_reconciliation",
+      "status": "passed",
+      "details": "2431.17 + 6000.00 - 3131.05 = 5300.12"
+    },
+    {
+      "document_id": "DOC-SYN-A-STMT-08",
+      "check": "statement_reconciliation",
+      "status": "passed",
+      "details": "5300.12 + 6000.00 - 3266.72 = 8033.40"
+    },
+    {
+      "document_id": "DOC-SYN-A-STMT-09",
+      "check": "statement_reconciliation",
+      "status": "passed",
+      "details": "8033.40 + 6000.00 - 3399.91 = 10633.49"
+    },
+    {
+      "document_id": "DOC-SYN-A-LIC",
+      "check": "identity_consistency",
+      "status": "passed",
+      "details": "Name, DOB, address and expiry agree with canonical application; synthetic marker present."
+    },
+    {
+      "document_id": "DOC-SYN-A-PAY-16",
+      "check": "pay_arithmetic",
+      "status": "passed",
+      "details": "3900.00 - 900.00 = 3000.00"
+    },
+    {
+      "document_id": "DOC-SYN-A-PAY-17",
+      "check": "pay_arithmetic",
+      "status": "passed",
+      "details": "3900.00 - 900.00 = 3000.00"
+    },
+    {
+      "document_id": "DOC-SYN-A-PAY-18",
+      "check": "pay_arithmetic",
+      "status": "passed",
+      "details": "3900.00 - 900.00 = 3000.00"
+    },
+    {
+      "document_id": "DOC-SYN-A-PAY-19",
+      "check": "pay_arithmetic",
+      "status": "passed",
+      "details": "3900.00 - 900.00 = 3000.00"
+    }
+  ]
+}

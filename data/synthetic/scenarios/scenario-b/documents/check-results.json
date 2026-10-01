@@ -1,0 +1,89 @@
+{
+  "check_version": "document-check-fixture-v1",
+  "results": [
+    {
+      "document_id": "DOC-SYN-B-B1-STMT-07",
+      "check": "statement_reconciliation",
+      "status": "passed",
+      "details": "2864.47 + 6100.00 - 5240.00 = 3724.47"
+    },
+    {
+      "document_id": "DOC-SYN-B-B2-STMT-07",
+      "check": "statement_reconciliation",
+      "status": "passed",
+      "details": "224.00 + 400.00 - 370.00 = 254.00"
+    },
+    {
+      "document_id": "DOC-SYN-B-B1-STMT-08",
+      "check": "statement_reconciliation",
+      "status": "passed",
+      "details": "3724.47 + 6000.00 - 5800.00 = 3924.47"
+    },
+    {
+      "document_id": "DOC-SYN-B-B2-STMT-08",
+      "check": "statement_reconciliation",
+      "status": "passed",
+      "details": "254.00 + 400.00 - 450.00 = 204.00"
+    },
+    {
+      "document_id": "DOC-SYN-B-B1-STMT-09",
+      "check": "statement_reconciliation",
+      "status": "passed",
+      "details": "3924.47 + 6400.00 - 5520.00 = 4804.47"
+    },
+    {
+      "document_id": "DOC-SYN-B-B2-STMT-09",
+      "check": "statement_reconciliation",
+      "status": "passed",
+      "details": "204.00 + 400.00 - 405.00 = 199.00"
+    },
+    {
+      "document_id": "DOC-SYN-B-PAY-01",
+      "check": "pay_arithmetic",
+      "status": "passed",
+      "details": "1625.00 - 325.00 = 1300.00"
+    },
+    {
+      "document_id": "DOC-SYN-B-PAY-02",
+      "check": "pay_arithmetic",
+      "status": "passed",
+      "details": "2125.00 - 425.00 = 1700.00"
+    },
+    {
+      "document_id": "DOC-SYN-B-PAY-03",
+      "check": "pay_arithmetic",
+      "status": "passed",
+      "details": "1750.00 - 350.00 = 1400.00"
+    },
+    {
+      "document_id": "DOC-SYN-B-PAY-04",
+      "check": "pay_arithmetic",
+      "status": "passed",
+      "details": "2000.00 - 400.00 = 1600.00"
+    },
+    {
+      "document_id": "DOC-SYN-B-PAY-05",
+      "check": "pay_arithmetic",
+      "status": "passed",
+      "details": "1875.00 - 375.00 = 1500.00"
+    },
+    {
+      "document_id": "DOC-SYN-B-PAY-06",
+      "check": "pay_arithmetic",
+      "status": "passed",
+      "details": "2250.00 - 450.00 = 1800.00"
+    },
+    {
+      "document_id": "DOC-SYN-B-PAY-07",
+      "check": "pay_arithmetic",
+      "status": "passed",
+      "details": "1687.50 - 337.50 = 1350.00"
+    },
+    {
+      "document_id": "DOC-SYN-B-PAY-08",
+      "check": "pay_arithmetic",
+      "status": "passed",
+      "details": "2187.50 - 437.50 = 1750.00"
+    }
+  ]
+}

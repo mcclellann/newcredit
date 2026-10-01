@@ -1,6 +1,7 @@
 # Personal Loan Demonstration — Product Requirements
 
-**Status:** Draft v0.2  
+**Status:** Approved v1.0
+
 **Purpose:** Establish the product boundary before implementation.
 
 ## 1. Product objective
@@ -62,7 +63,8 @@ human review step is later required.
 
 1. Start an application and select **Existing customer**.
 2. Sign in through a simulated demonstration login.
-3. Load known customer details and ask the applicant to confirm them.
+3. Load identity, contact, address, known account, asset, and liability details
+   and ask the applicant to confirm them.
 4. Upload two months of payslips.
 5. Upload bank statements covering three months.
 6. Complete processing, review, correction, verification, submission, and
@@ -81,6 +83,10 @@ production authentication design.
 - The applicant can request an amount from AUD 5,000 through AUD 100,000,
   inclusive.
 - The applicant can request a term of 1, 2, 3, 4, or 5 years.
+- The applicant must be at least 18, have an Australian residential address, an
+  Australian transaction account, and verifiable ongoing income.
+- Supported purposes are debt consolidation, vehicle, home improvements,
+  medical or dental, education, major purchase, and other with an explanation.
 - The indicative annual interest rate is risk-based at 12%, 15.5%, or 19%, with
   an AUD 15 monthly fee.
 - Processing status is visible: draft, documents required, processing, review
@@ -94,7 +100,8 @@ production authentication design.
   calendar months.
 - Every applicant must provide statements for the latest three complete calendar
   months from every account with transaction activity during that period.
-- Accepted file formats, size limits, and page limits remain to be decided.
+- Accept PDF, JPEG, and PNG files up to 20 MB each. Fixture-specific page counts
+  are validated against the expected document type.
 - The application identifies missing periods, unreadable pages, duplicate
   uploads, and unsupported files.
 
@@ -111,6 +118,8 @@ production authentication design.
   where present.
 - Low-confidence or conflicting values must be highlighted for applicant or
   operator review; they must not silently overwrite trusted customer data.
+- Use deterministic local processing authored with each synthetic fixture. Do
+  not send documents to cloud OCR, identity, or fraud providers.
 
 ### 4.4 Customer and financial information
 
@@ -130,6 +139,13 @@ The populated application must support:
 Values may be applicant-declared, document-extracted, transaction-derived, or
 loaded from an existing customer record. The source and verification status of
 each material value must remain visible.
+
+Existing customer records never make old income or expenses current; the
+applicant confirms profile data and current finances are re-verified. Preserve
+all joint-account transactions but use only the applicant's confirmed share in
+affordability. Include accounts opened or closed during the statement window,
+record the available coverage, and do not treat an explained partial period as
+missing. Pair internal transfers before calculating income or expenses.
 
 ### 4.5 Applicant verification
 
@@ -221,6 +237,10 @@ The complete flow and record requirements are defined in
   an automated signal.
 - Meet WCAG 2.2 Level AA for the web interface.
 - Avoid logging document contents or personally identifiable information.
+- Obtain explicit synthetic-demo consent before document upload and submission.
+- Keep local demonstration data until operator deletion or reset. Application
+  deletion removes its uploads and derived records; full reset also clears its
+  synthetic audit events. Do not use external analytics.
 - Obtain Australian legal and compliance review before presenting any workflow,
   score, or outcome as suitable for real lending.
 - Support deployment on either a local Windows host through WSL2 or a local
@@ -267,14 +287,12 @@ A demonstration is complete when:
 9. Supported deployment targets are a local Windows machine running WSL2 and a
    native macOS machine, each behind a proxy without a directly reachable public
    address.
+10. The approved eligibility, loan-purpose, existing-customer, account,
+    document-processing, taxonomy, normalization, and retention defaults are
+    those recorded in this specification and [Data preparation](data-preparation.md).
 
-## 8. Decisions still required before implementation
+## 8. Implementation readiness
 
-1. Loan purpose and any additional eligibility fields to collect.
-2. Which synthetic customer details are pre-populated after simulated login.
-3. How joint accounts and accounts opened or closed during the period are
-   represented.
-4. Supported document formats and whether extraction/checking uses a real
-   provider, a local model, or deterministic demonstration fixtures.
-5. Transaction categories that must be separated for the intended audience.
-6. Retention, consent, deletion, accessibility, and audit requirements.
+No product or data-readiness decision currently blocks implementation. Scenario
+A and B source records and independently authored expected outputs were approved
+by the repository owner on 1 October 2026.

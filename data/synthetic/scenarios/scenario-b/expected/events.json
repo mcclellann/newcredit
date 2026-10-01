@@ -1,0 +1,57 @@
+{
+  "audit_events": [
+    {
+      "sequence": 1,
+      "event_id": "AUD-SYN-B-001",
+      "type": "simulated_login_completed",
+      "at": "2026-10-01T11:00:00+10:00"
+    },
+    {
+      "sequence": 2,
+      "event_id": "AUD-SYN-B-002",
+      "type": "profile_loaded",
+      "at": "2026-10-01T11:01:00+10:00"
+    },
+    {
+      "sequence": 3,
+      "event_id": "AUD-SYN-B-003",
+      "type": "profile_confirmed",
+      "at": "2026-10-01T11:05:00+10:00"
+    },
+    {
+      "sequence": 4,
+      "event_id": "AUD-SYN-B-004",
+      "type": "documents_uploaded",
+      "at": "2026-10-01T11:08:00+10:00"
+    },
+    {
+      "sequence": 5,
+      "event_id": "AUD-SYN-B-005",
+      "type": "document_checks_passed",
+      "at": "2026-10-01T11:10:00+10:00"
+    },
+    {
+      "sequence": 6,
+      "event_id": "AUD-SYN-B-006",
+      "type": "applicant_confirmed",
+      "at": "2026-10-01T11:20:00+10:00"
+    },
+    {
+      "sequence": 7,
+      "event_id": "AUD-SYN-B-007",
+      "type": "application_submitted",
+      "at": "2026-10-01T11:21:00+10:00"
+    },
+    {
+      "sequence": 8,
+      "event_id": "AUD-SYN-B-008",
+      "type": "risk_scored_referred",
+      "at": "2026-10-01T11:21:05+10:00"
+    }
+  ],
+  "offer": null,
+  "disbursements": [],
+  "blocked_reason": "REFERRED_REQUIRES_DEMONSTRATION_OPERATOR_APPROVAL",
+  "completed_funds_movement_events": 0,
+  "simulation_notice": "No offer accepted and no money was transferred."
+}

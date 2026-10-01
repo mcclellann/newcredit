@@ -1,0 +1,35 @@
+{
+  "customer_id": "CUST-SYN-002",
+  "customer_type": "existing",
+  "legal_name": {
+    "display": "Morgan Sample",
+    "given": "Morgan",
+    "family": "Sample"
+  },
+  "date_of_birth": "1986-11-23",
+  "email": "morgan.sample@example.com",
+  "phone": "0491 570 202",
+  "residential_address": {
+    "line1": "42 Lantern Fiction Crescent",
+    "suburb": "Sample Vale",
+    "state": "VIC",
+    "postcode": "3000",
+    "country": "AU",
+    "fictional": true
+  },
+  "licence_number": null,
+  "licence_expiry": null,
+  "existing_customer_reference": "EXIST-SYN-B-204",
+  "profile_confirmation": {
+    "confirmed": true,
+    "at": "2026-10-01T11:05:00+10:00",
+    "fields": [
+      "identity",
+      "contact",
+      "address",
+      "accounts",
+      "assets",
+      "liabilities"
+    ]
+  }
+}
