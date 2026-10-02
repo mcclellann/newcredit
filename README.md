@@ -1,10 +1,11 @@
 # newcredit
 A demonstration of a simplified personal-loan application process.
 
-The first working vertical slice implements the approved Scenario A journey with
-a React web client, Fastify/OpenAPI service, SQLite persistence, deterministic
-assessment fixtures, simulated offer acceptance, and idempotent simulated
-funding.
+The first two working vertical slices implement the approved Scenario A and B
+journeys with a React web client, Fastify/OpenAPI service, SQLite persistence,
+and deterministic assessment fixtures. They cover a new-customer indicative
+approval with simulated funding and an existing-customer referral that blocks
+offer creation and funds movement.
 
 ## Run locally
 

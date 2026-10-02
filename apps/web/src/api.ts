@@ -1,4 +1,4 @@
-import type { Application, Disbursement, Offer, Outcome } from './types'
+import type { Application, Correction, DemoLogin, Disbursement, Offer, Outcome } from './types'
 
 const base = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
 
@@ -23,8 +23,10 @@ const key = () => crypto.randomUUID()
 export const api = {
   scenarios: () => request<unknown>('/demo-scenarios'),
   createSession: () => request<unknown>('/demo-sessions', { method: 'POST', body: JSON.stringify({ scenarioId: 'scenario-a' }) }),
-  createApplication: () => request<Application>('/applications', { method: 'POST', body: JSON.stringify({ scenarioId: 'scenario-a' }) }),
+  login: () => request<DemoLogin>('/demo-sessions/login', { method: 'POST', body: JSON.stringify({ scenarioId: 'scenario-b' }) }),
+  createApplication: (scenarioId: 'scenario-a' | 'scenario-b' = 'scenario-a') => request<Application>('/applications', { method: 'POST', body: JSON.stringify({ scenarioId }) }),
   application: (id: string) => request<Application>(`/applications/${id}`),
+  correctPurpose: (id: string, purposeDetail: string) => request<Correction>(`/applications/${id}/corrections`, { method: 'POST', body: JSON.stringify({ purposeDetail }) }),
   submit: (id: string) => request<Application>(`/applications/${id}/submission`, { method: 'POST', headers: { 'Idempotency-Key': key() }, body: JSON.stringify({ confirmation: true }) }),
   outcome: (id: string) => request<Outcome>(`/applications/${id}/outcome`),
   offer: (id: string) => request<Offer>(`/applications/${id}/offer`),

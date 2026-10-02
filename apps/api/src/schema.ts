@@ -39,3 +39,11 @@ export const idempotencyRecords = sqliteTable('idempotency_records', {
   responseBody: text('response_body').notNull(),
   createdAt: text('created_at').notNull(),
 }, (table) => [primaryKey({ columns: [table.operation, table.idempotencyKey] })])
+
+export const applicationCorrections = sqliteTable('application_corrections', {
+  id: text('id').primaryKey(),
+  applicationId: text('application_id').notNull().references(() => applications.id),
+  field: text('field').notNull(), originalValue: text('original_value').notNull(),
+  currentValue: text('current_value').notNull(), applicationVersion: integer('application_version').notNull(),
+  createdAt: text('created_at').notNull(),
+})

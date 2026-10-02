@@ -5,11 +5,12 @@ import { Type } from '@sinclair/typebox'
 import { randomUUID } from 'node:crypto'
 import type { ApplicationStatus, DemoApplication, Disbursement, Offer, Outcome } from '@newcredit/domain'
 import { assertTransition } from '@newcredit/domain'
-import { loadScenarioA } from '@newcredit/test-fixtures'
+import { loadScenario, type ScenarioId } from '@newcredit/test-fixtures'
 import { createDatabase, migrateDatabase, type ApiDatabase } from './db.js'
 
 const Id = Type.Object({ id: Type.String({ minLength: 1 }) })
-const ScenarioBody = Type.Object({ scenarioId: Type.Literal('scenario-a') }, { additionalProperties: false })
+const ScenarioIdSchema = Type.Union([Type.Literal('scenario-a'), Type.Literal('scenario-b')])
+const ScenarioBody = Type.Object({ scenarioId: ScenarioIdSchema }, { additionalProperties: false })
 const ConfirmationBody = Type.Object({ confirmation: Type.Literal(true) }, { additionalProperties: false })
 const IdempotencyHeaders = Type.Object({ 'idempotency-key': Type.String({ minLength: 1, maxLength: 255 }) })
 const MoneySchema = Type.Object({ amountMinor: Type.Integer(), currency: Type.Literal('AUD') })
@@ -19,17 +20,19 @@ const DocumentSchema = Type.Object({
   status: Type.Literal('processed'),
 })
 const ApplicationSchema = Type.Object({
-  id: Type.String(), scenarioId: Type.Literal('scenario-a'),
-  status: Type.Union([Type.Literal('ready_to_submit'), Type.Literal('submitted'), Type.Literal('offer_accepted'), Type.Literal('funded')]),
+  id: Type.String(), scenarioId: ScenarioIdSchema,
+  status: Type.Union([Type.Literal('ready_to_submit'), Type.Literal('submitted'), Type.Literal('referred'), Type.Literal('offer_accepted'), Type.Literal('funded')]),
   version: Type.Integer(), fixedDemonstrationDate: Type.String(),
-  customer: Type.Object({ type: Type.Literal('new'), name: Type.String(), dateOfBirth: Type.String(), email: Type.String(), phone: Type.String(), address: Type.String(), employer: Type.String() }),
+  customer: Type.Object({ type: Type.Union([Type.Literal('new'), Type.Literal('existing')]), name: Type.String(), dateOfBirth: Type.String(), email: Type.String(), phone: Type.String(), address: Type.String(), employer: Type.String(), existingCustomerReference: Type.Optional(Type.String()), profileConfirmation: Type.Optional(Type.Object({ confirmed: Type.Boolean(), at: Type.String(), fields: Type.Array(Type.String()) })) }),
   loan: Type.Object({ amount: MoneySchema, termYears: Type.Integer(), purpose: Type.String(), purposeDetail: Type.String() }),
   documents: Type.Array(DocumentSchema),
-  review: Type.Object({ monthlyNetIncome: MoneySchema, assessedLivingExpenses: MoneySchema, monthlyHousing: MoneySchema, classifiedTransactionCount: Type.Integer(), documentChecksPassed: Type.Integer() }),
+  accounts: Type.Array(Type.Object({ id: Type.String(), type: Type.String(), ownership: Type.Union([Type.Literal('sole'), Type.Literal('joint')]), applicantShare: Type.Number(), bsbMasked: Type.String(), accountMasked: Type.String(), active: Type.Boolean() })),
+  financialPosition: Type.Object({ assetsTotal: MoneySchema, liabilitiesTotal: MoneySchema, monthlyDebtRepayments: MoneySchema }),
+  review: Type.Object({ monthlyNetIncome: MoneySchema, assessedLivingExpenses: MoneySchema, monthlyHousing: MoneySchema, classifiedTransactionCount: Type.Integer(), documentChecksPassed: Type.Integer(), transactionCategories: Type.Array(Type.Object({ category: Type.String(), count: Type.Integer() })) }),
 })
 const OutcomeSchema = Type.Object({
-  applicationId: Type.String(), decision: Type.Literal('indicatively_approved'), riskScore: Type.Integer(), riskBand: Type.Literal('very_low'),
-  affordability: Type.Literal('affordable'), monthlySurplus: MoneySchema, reasons: Type.Array(Type.String()), illustrativeNotOffer: Type.Literal(true),
+  applicationId: Type.String(), decision: Type.Union([Type.Literal('indicatively_approved'), Type.Literal('referred')]), riskScore: Type.Integer(), riskBand: Type.Union([Type.Literal('very_low'), Type.Literal('moderate')]),
+  affordability: Type.Literal('affordable'), monthlySurplus: MoneySchema, reasons: Type.Array(Type.String()), factors: Type.Array(Type.Object({ factor: Type.String(), signal: Type.String(), riskValue: Type.Integer() })), illustrativeNotOffer: Type.Literal(true),
 })
 const OfferSchema = Type.Object({
   id: Type.String(), applicationId: Type.String(), principal: MoneySchema, termYears: Type.Integer(), annualRateBasisPoints: Type.Integer(),
@@ -62,7 +65,7 @@ export async function buildApp(options: BuildAppOptions = {}) {
       callback(null, allowed)
     },
   })
-  await app.register(swagger, { openapi: { openapi: '3.1.0', info: { title: 'NewCredit Scenario A API', version: '1.0.0' } } })
+  await app.register(swagger, { openapi: { openapi: '3.1.0', info: { title: 'NewCredit Demo API', version: '1.1.0' } } })
 
   app.setErrorHandler((error, request, reply) => {
     const normalized = error instanceof Error ? error : new Error('Unknown error')
@@ -78,8 +81,8 @@ export async function buildApp(options: BuildAppOptions = {}) {
   app.get('/health', { schema: { tags: ['system'], response: { 200: Type.Object({ status: Type.Literal('ok') }) } } }, async () => ({ status: 'ok' }))
   app.get('/openapi.json', { schema: { hide: true } }, async () => app.swagger())
 
-  app.get('/api/v1/demo-scenarios', { schema: { tags: ['demo'], response: { 200: Type.Object({ scenarios: Type.Array(Type.Object({ id: Type.Literal('scenario-a'), name: Type.String(), description: Type.String() })) }) } } }, async () => ({
-    scenarios: [{ id: 'scenario-a', name: 'Scenario A', description: 'Indicative approval and simulated funding' }],
+  app.get('/api/v1/demo-scenarios', { schema: { tags: ['demo'], response: { 200: Type.Object({ scenarios: Type.Array(Type.Object({ id: ScenarioIdSchema, name: Type.String(), description: Type.String() })) }) } } }, async () => ({
+    scenarios: [{ id: 'scenario-a' as const, name: 'Scenario A', description: 'Indicative approval and simulated funding' }, { id: 'scenario-b' as const, name: 'Scenario B', description: 'Existing customer referral' }],
   }))
 
   app.post('/api/v1/demo-sessions', { schema: { tags: ['demo'], response: { 201: Type.Object({ id: Type.String(), createdAt: Type.String() }) } } }, async (_request, reply) => {
@@ -88,15 +91,18 @@ export async function buildApp(options: BuildAppOptions = {}) {
     return reply.code(201).send(session)
   })
 
-  app.post('/api/v1/applications', { schema: { tags: ['applications'], body: ScenarioBody, response: { 201: ApplicationSchema } } }, async (_request, reply) => {
-    const fixture = await loadScenarioA()
+  app.post('/api/v1/demo-sessions/login', { schema: { tags: ['demo'], body: Type.Object({ scenarioId: Type.Literal('scenario-b') }), response: { 200: Type.Object({ scenarioId: Type.Literal('scenario-b'), customerReference: Type.String(), customerName: Type.String(), simulated: Type.Literal(true), notice: Type.String() }) } } }, async () => ({ scenarioId: 'scenario-b' as const, customerReference: 'EXIST-SYN-B-204', customerName: 'Morgan Sample', simulated: true as const, notice: 'Demonstration login only; this is not production authentication.' }))
+
+  app.post('/api/v1/applications', { schema: { tags: ['applications'], body: ScenarioBody, response: { 201: ApplicationSchema } } }, async (request, reply) => {
+    const scenarioId = (request.body as { scenarioId: ScenarioId }).scenarioId
+    const fixture = await loadScenario(scenarioId)
     const id = randomUUID()
     const timestamp = now()
     const application: DemoApplication = { id, status: 'ready_to_submit', version: 1, ...fixture.application }
     const outcome: Outcome = { applicationId: id, ...fixture.outcome }
     db.prepare(`INSERT INTO applications
       (id, scenario_id, status, version, snapshot, outcome_snapshot, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`).run(id, 'scenario-a', application.status, 1, JSON.stringify(application), JSON.stringify(outcome), timestamp, timestamp)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`).run(id, scenarioId, application.status, 1, JSON.stringify(application), JSON.stringify(outcome), timestamp, timestamp)
     return reply.code(201).send(application)
   })
 
@@ -114,6 +120,29 @@ export async function buildApp(options: BuildAppOptions = {}) {
   app.get('/api/v1/applications/:id', { schema: { tags: ['applications'], params: Id, response: { 200: ApplicationSchema } } }, async (request) => {
     const { id } = request.params as { id: string }
     return parse<DemoApplication>(getApplicationRow(id).snapshot as string)
+  })
+
+  const CorrectionSchema = Type.Object({ id: Type.String(), applicationId: Type.String(), field: Type.Literal('loan.purposeDetail'), originalValue: Type.String(), currentValue: Type.String(), applicationVersion: Type.Integer(), createdAt: Type.String() })
+  app.post('/api/v1/applications/:id/corrections', { schema: { tags: ['applications'], params: Id, body: Type.Object({ purposeDetail: Type.String({ minLength: 1, maxLength: 500 }) }, { additionalProperties: false }), response: { 201: CorrectionSchema } } }, async (request, reply) => {
+    const { id } = request.params as { id: string }
+    const purposeDetail = (request.body as { purposeDetail: string }).purposeDetail
+    const correction = db.transaction(() => {
+      const row = getApplicationRow(id)
+      if (row.status !== 'ready_to_submit') throw new HttpProblem(409, 'Correction Not Allowed', 'Corrections are only allowed before submission')
+      const application = parse<DemoApplication>(row.snapshot as string)
+      const version = (row.version as number) + 1
+      const body = { id: randomUUID(), applicationId: id, field: 'loan.purposeDetail' as const, originalValue: application.loan.purposeDetail, currentValue: purposeDetail, applicationVersion: version, createdAt: now() }
+      application.loan.purposeDetail = purposeDetail; application.version = version
+      db.prepare('UPDATE applications SET version = ?, snapshot = ?, updated_at = ? WHERE id = ?').run(version, JSON.stringify(application), body.createdAt, id)
+      db.prepare('INSERT INTO application_corrections (id, application_id, field, original_value, current_value, application_version, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)').run(body.id, id, body.field, body.originalValue, body.currentValue, body.applicationVersion, body.createdAt)
+      return body
+    })()
+    return reply.code(201).send(correction)
+  })
+  app.get('/api/v1/applications/:id/corrections', { schema: { tags: ['applications'], params: Id, response: { 200: Type.Object({ corrections: Type.Array(CorrectionSchema) }) } } }, async (request) => {
+    const { id } = request.params as { id: string }; getApplicationRow(id)
+    const rows = db.prepare('SELECT id, application_id applicationId, field, original_value originalValue, current_value currentValue, application_version applicationVersion, created_at createdAt FROM application_corrections WHERE application_id = ? ORDER BY application_version').all(id)
+    return { corrections: rows }
   })
 
   function replay(operation: string, key: string, resourceId: string, reply: FastifyReply): boolean {
@@ -135,18 +164,22 @@ export async function buildApp(options: BuildAppOptions = {}) {
     const { id } = request.params as { id: string }
     const key = request.headers['idempotency-key'] as string
     if (replay('submission', key, id, reply)) return
-    const fixture = await loadScenarioA()
+    const fixture = await loadScenario(getApplicationRow(id).scenario_id as ScenarioId)
     const result = db.transaction(() => {
       const row = getApplicationRow(id)
       const status = row.status as ApplicationStatus
       if (status !== 'ready_to_submit') throw new HttpProblem(409, 'Invalid Application State', `Application is ${status}`)
-      assertTransition(status, 'submitted')
-      const application = { ...parse<DemoApplication>(row.snapshot as string), status: 'submitted' as const, version: (row.version as number) + 1 }
-      const offer: Offer = { ...fixture.offer, id: `${fixture.offer.id}-${id}`, applicationId: id, status: 'ready' }
+      const scenarioId = row.scenario_id as ScenarioId
+      const targetStatus = scenarioId === 'scenario-b' ? 'referred' as const : 'submitted' as const
+      assertTransition(status, targetStatus)
+      const application = { ...parse<DemoApplication>(row.snapshot as string), status: targetStatus, version: (row.version as number) + 1 }
       db.prepare('UPDATE applications SET status = ?, version = ?, snapshot = ?, updated_at = ? WHERE id = ?')
         .run(application.status, application.version, JSON.stringify(application), now(), id)
-      db.prepare('INSERT INTO offers (id, application_id, status, snapshot) VALUES (?, ?, ?, ?)')
-        .run(offer.id, id, offer.status, JSON.stringify(offer))
+      if (scenarioId === 'scenario-a') {
+        if (!fixture.offer) throw new Error('Scenario A offer fixture is missing')
+        const offer: Offer = { ...fixture.offer, id: `${fixture.offer.id}-${id}`, applicationId: id, status: 'ready' }
+        db.prepare('INSERT INTO offers (id, application_id, status, snapshot) VALUES (?, ?, ?, ?)').run(offer.id, id, offer.status, JSON.stringify(offer))
+      }
       record('submission', key, id, 200, application)
       return application
     })()
@@ -161,7 +194,8 @@ export async function buildApp(options: BuildAppOptions = {}) {
 
   app.get('/api/v1/applications/:id/offer', { schema: { tags: ['offers'], params: Id, response: { 200: OfferSchema } } }, async (request) => {
     const id = (request.params as { id: string }).id
-    getApplicationRow(id)
+    const application = getApplicationRow(id)
+    if (application.status === 'referred') throw new HttpProblem(409, 'Application Referred', 'This application was referred and no offer was created')
     const row = db.prepare('SELECT snapshot FROM offers WHERE application_id = ?').get(id) as { snapshot: string } | undefined
     if (!row) throw new HttpProblem(409, 'Offer Not Available', 'Submit the application first')
     return parse<Offer>(row.snapshot)

@@ -23,4 +23,13 @@ export function migrateDatabase(sqlite: Database.Database): void {
     const migration = fileURLToPath(new URL('../drizzle/0000_scenario_a.sql', import.meta.url))
     sqlite.exec(`BEGIN IMMEDIATE;\n${readFileSync(migration, 'utf8')}\nPRAGMA user_version = 1;\nCOMMIT;`)
   }
+  if ((sqlite.pragma('user_version', { simple: true }) as number) < 2) {
+    const migration = fileURLToPath(new URL('../drizzle/0001_scenario_b.sql', import.meta.url))
+    sqlite.pragma('foreign_keys = OFF')
+    try {
+      sqlite.exec(`BEGIN IMMEDIATE;\n${readFileSync(migration, 'utf8')}\nPRAGMA user_version = 2;\nCOMMIT;`)
+    } finally {
+      sqlite.pragma('foreign_keys = ON')
+    }
+  }
 }

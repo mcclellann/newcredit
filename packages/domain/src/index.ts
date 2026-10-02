@@ -1,6 +1,7 @@
 export type ApplicationStatus =
   | 'ready_to_submit'
   | 'submitted'
+  | 'referred'
   | 'offer_accepted'
   | 'funded'
 
@@ -20,18 +21,20 @@ export type DocumentSummary = {
 
 export type DemoApplication = {
   id: string
-  scenarioId: 'scenario-a'
+  scenarioId: 'scenario-a' | 'scenario-b'
   status: ApplicationStatus
   version: number
   fixedDemonstrationDate: string
   customer: {
-    type: 'new'
+    type: 'new' | 'existing'
     name: string
     dateOfBirth: string
     email: string
     phone: string
     address: string
     employer: string
+    existingCustomerReference?: string
+    profileConfirmation?: { confirmed: boolean; at: string; fields: string[] }
   }
   loan: {
     amount: Money
@@ -40,23 +43,31 @@ export type DemoApplication = {
     purposeDetail: string
   }
   documents: DocumentSummary[]
+  accounts: Array<{ id: string; type: string; ownership: 'sole' | 'joint'; applicantShare: number; bsbMasked: string; accountMasked: string; active: boolean }>
+  financialPosition: {
+    assetsTotal: Money
+    liabilitiesTotal: Money
+    monthlyDebtRepayments: Money
+  }
   review: {
     monthlyNetIncome: Money
     assessedLivingExpenses: Money
     monthlyHousing: Money
     classifiedTransactionCount: number
     documentChecksPassed: number
+    transactionCategories: Array<{ category: string; count: number }>
   }
 }
 
 export type Outcome = {
   applicationId: string
-  decision: 'indicatively_approved'
+  decision: 'indicatively_approved' | 'referred'
   riskScore: number
-  riskBand: 'very_low'
+  riskBand: 'very_low' | 'moderate'
   affordability: 'affordable'
   monthlySurplus: Money
   reasons: string[]
+  factors: Array<{ factor: string; signal: string; riskValue: number }>
   illustrativeNotOffer: true
 }
 
@@ -96,8 +107,9 @@ export const aud = (dollars: string): Money => {
 
 export function assertTransition(from: ApplicationStatus, to: ApplicationStatus): void {
   const allowed: Record<ApplicationStatus, ApplicationStatus[]> = {
-    ready_to_submit: ['submitted'],
+    ready_to_submit: ['submitted', 'referred'],
     submitted: ['offer_accepted'],
+    referred: [],
     offer_accepted: ['funded'],
     funded: [],
   }

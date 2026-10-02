@@ -1,16 +1,16 @@
 # Installation and Deployment
 
-**Status:** Scenario A development workflow implemented; production packaging remains planned
+**Status:** Scenario A and B development workflows implemented; production packaging remains planned
 
 **Targets:** Windows 11 with WSL2, and native macOS
 
 ## 1. Current repository status
 
-The repository contains a working Scenario A web/API vertical slice. Dependency
-installation, build, tests, SQLite migration, OpenAPI generation, and local
-development commands are implemented and exercised in an Amp Linux orb. Clean
-checkout verification on Windows/WSL2 and native macOS remains required before
-either platform is called a supported packaged deployment.
+The repository contains working Scenario A and B web/API vertical slices.
+Dependency installation, build, tests, SQLite migration, OpenAPI generation,
+and local development commands are implemented and exercised in an Amp Linux
+orb. Clean checkout verification on Windows/WSL2 and native macOS remains
+required before either platform is called a supported packaged deployment.
 
 ## 2. Shared deployment shape
 
