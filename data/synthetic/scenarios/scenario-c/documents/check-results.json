@@ -1,0 +1,81 @@
+{
+  "check_version": "document-check-fixture-v1",
+  "results": [
+    {
+      "document_id": "DOC-SYN-C-STMT-08",
+      "check": "statement_reconciliation",
+      "status": "passed",
+      "details": "5300.12 + 6000.00 - 3266.72 = 8033.40"
+    },
+    {
+      "document_id": "DOC-SYN-C-STMT-09",
+      "check": "statement_reconciliation",
+      "status": "passed",
+      "details": "8033.40 + 6000.00 - 3399.91 = 10633.49"
+    },
+    {
+      "document_id": "DOC-SYN-C-LIC",
+      "check": "field_readability",
+      "status": "needs_review",
+      "field_name": "licence_number",
+      "details": "Licence number region is deliberately obscured in this synthetic fixture; no normalized value may be accepted."
+    },
+    {
+      "document_id": "DOC-SYN-C-LIC",
+      "check": "identity_consistency",
+      "status": "unavailable",
+      "details": "Identity consistency cannot complete because the licence number is unreadable."
+    },
+    {
+      "document_id": "DOC-SYN-C-PAY-16",
+      "check": "pay_arithmetic",
+      "status": "passed",
+      "details": "3900.00 - 900.00 = 3000.00"
+    },
+    {
+      "document_id": "DOC-SYN-C-PAY-17",
+      "check": "pay_arithmetic",
+      "status": "passed",
+      "details": "3900.00 - 900.00 = 3000.00"
+    },
+    {
+      "document_id": "DOC-SYN-C-PAY-18",
+      "check": "pay_arithmetic",
+      "status": "passed",
+      "details": "3900.00 - 900.00 = 3000.00"
+    },
+    {
+      "document_id": "DOC-SYN-C-PAY-19",
+      "check": "pay_arithmetic",
+      "status": "passed",
+      "details": "3900.00 - 900.00 = 3000.00"
+    },
+    {
+      "application_id": "APP-SYN-C",
+      "check": "required_statement_coverage",
+      "status": "needs_review",
+      "account_id": "ACCT-SYN-C1",
+      "required_period": {
+        "start": "2026-07-01",
+        "end": "2026-09-30"
+      },
+      "available_periods": [
+        {
+          "start": "2026-08-01",
+          "end": "2026-08-31"
+        },
+        {
+          "start": "2026-09-01",
+          "end": "2026-09-30"
+        }
+      ],
+      "missing_periods": [
+        {
+          "start": "2026-07-01",
+          "end": "2026-07-31"
+        }
+      ],
+      "details": "July 2026 statement is absent for an account active during the required window."
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+transaction_id,category,confidence,method,annotator_rationale,ambiguity_flag,allowed_alternative,second_review_required,review_status
+TXN-SYN-C-011,expense.housing,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-C-012,expense.utilities,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-C-013,income.salary,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-C-014,expense.groceries,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-C-015,expense.transport,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-C-016,expense.insurance,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-C-017,income.salary,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-C-018,expense.discretionary,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-C-019,expense.healthcare,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-C-020,expense.other,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-C-021,expense.housing,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-C-022,income.salary,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-C-023,expense.utilities,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-C-024,expense.groceries,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-C-025,expense.transport,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-C-026,income.salary,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-C-027,expense.insurance,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-C-028,expense.discretionary,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-C-029,expense.healthcare,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved
+TXN-SYN-C-030,expense.other,0.99,independent-human-label-v1,Unambiguous source text,false,,false,approved

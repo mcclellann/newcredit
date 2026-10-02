@@ -21,7 +21,7 @@ describe('Scenario B API', () => {
 
     migrateDatabase(sqlite)
 
-    expect(sqlite.pragma('user_version', { simple: true })).toBe(2)
+    expect(sqlite.pragma('user_version', { simple: true })).toBe(3)
     expect(sqlite.prepare('SELECT scenario_id FROM applications WHERE id = ?').get('app-a')).toEqual({ scenario_id: 'scenario-a' })
     expect(sqlite.prepare('SELECT application_id FROM offers WHERE id = ?').get('offer-a')).toEqual({ application_id: 'app-a' })
     expect(sqlite.pragma('foreign_key_check')).toEqual([])

@@ -1,0 +1,18 @@
+{
+  "score_version": "credit-risk-v0.1",
+  "status": "not_scored",
+  "input_period": null,
+  "factors": [],
+  "composite_risk": null,
+  "score": null,
+  "band": null,
+  "pricing_tier": null,
+  "offered_rate": null,
+  "affordability": null,
+  "outcome": "outcome_withheld",
+  "reason_codes": [
+    "REQUIRED_STATEMENT_PERIOD_MISSING",
+    "REQUIRED_LICENCE_FIELD_UNREADABLE"
+  ],
+  "illustrative_not_offer": true
+}

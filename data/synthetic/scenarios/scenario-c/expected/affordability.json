@@ -1,0 +1,10 @@
+{
+  "methodology_version": "affordability-v0.1",
+  "status": "not_assessed",
+  "result": null,
+  "blocking_reasons": [
+    "REQUIRED_STATEMENT_PERIOD_MISSING",
+    "REQUIRED_LICENCE_FIELD_UNREADABLE"
+  ],
+  "details": "Assessment is not run while required source information needs review."
+}

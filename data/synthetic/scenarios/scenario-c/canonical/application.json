@@ -1,0 +1,18 @@
+{
+  "application_id": "APP-SYN-C",
+  "customer_id": "CUST-SYN-003",
+  "status": "needs_review",
+  "requested_amount": "40000.00",
+  "requested_term_years": 3,
+  "loan_purpose": "home_improvements",
+  "purpose_detail": "Synthetic energy-efficiency improvements",
+  "assessment_rate": "0.19",
+  "offered_rate": null,
+  "monthly_fee": "15.00",
+  "serviceability_buffer": "0.20",
+  "applicant_confirmation": {
+    "confirmed": false,
+    "at": null
+  },
+  "synthetic_demo_consent": true
+}

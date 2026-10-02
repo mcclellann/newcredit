@@ -1,0 +1,18 @@
+{
+  "application_id": "APP-SYN-C",
+  "entries": [
+    {
+      "id": "FP-C-IN",
+      "kind": "income",
+      "subtype": "salary",
+      "description": "Verified regular net salary",
+      "amount": "3000.00",
+      "currency": "AUD",
+      "frequency": "fortnightly",
+      "normalized_monthly": "6500.00",
+      "effective_date": "2026-10-01",
+      "source": "document",
+      "verification_status": "verified"
+    }
+  ]
+}

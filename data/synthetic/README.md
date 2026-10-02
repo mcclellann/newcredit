@@ -24,6 +24,7 @@ rebuild every PDF and refresh its SHA-256 manifest value. The generator requires
 the packages in `requirements-docs.txt`. Document layouts are source-like but
 original, visibly synthetic, and contain no copied logos or security features.
 
-The scenario manifest defines the first eight customer packs. Scenario A and B
-are the owner-approved implementation baseline; remaining packs follow after the
-first vertical slice validates the fixture contract.
+The scenario manifest defines the first eight customer packs. Scenarios A, B,
+and C are owner-approved implementation baselines. Scenario C is the deterministic
+`needs_review` document-intake baseline: its missing July statement and unreadable
+licence number block scoring, outcome, offer creation, and funds movement.

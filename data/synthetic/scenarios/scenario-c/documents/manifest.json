@@ -1,0 +1,89 @@
+{
+  "fixed_demonstration_date": "2026-10-01",
+  "documents": [
+    {
+      "document_id": "DOC-SYN-C-STMT-08",
+      "document_type": "bank_statement",
+      "file": "documents/bank-statement-2026-08.pdf",
+      "stated_issuer": "Nick's Bank (fictional)",
+      "period_start": "2026-08-01",
+      "period_end": "2026-08-31",
+      "page_count": 1,
+      "content_hash": "sha256:32570e4b1faee28a7cd4a47bad7cfb99966b659758592cc16d121908ac52b9a2",
+      "processing_status": "processed",
+      "synthetic_notice_visible": true
+    },
+    {
+      "document_id": "DOC-SYN-C-STMT-09",
+      "document_type": "bank_statement",
+      "file": "documents/bank-statement-2026-09.pdf",
+      "stated_issuer": "Nick's Bank (fictional)",
+      "period_start": "2026-09-01",
+      "period_end": "2026-09-30",
+      "page_count": 1,
+      "content_hash": "sha256:593705e86e2a327e3cdf8b7a6497226c11300bf3e7969bd35c50ec6f3c2ca46b",
+      "processing_status": "processed",
+      "synthetic_notice_visible": true
+    },
+    {
+      "document_id": "DOC-SYN-C-LIC",
+      "document_type": "drivers_licence",
+      "file": "documents/drivers-licence.pdf",
+      "stated_issuer": "Freddie State Transport Authority (fictional)",
+      "period_start": null,
+      "period_end": null,
+      "page_count": 1,
+      "content_hash": "sha256:fd1725bf4aab1b6ce2c905584302d4a6a4883c5c6c396c62339302bd5868b873",
+      "processing_status": "needs_review",
+      "synthetic_notice_visible": true
+    },
+    {
+      "document_id": "DOC-SYN-C-PAY-16",
+      "document_type": "payslip",
+      "file": "documents/payslip-2026-08-07.pdf",
+      "stated_issuer": "Synthetic Services Pty Ltd (unofficial synthetic fixture)",
+      "period_start": "2026-08-07",
+      "period_end": "2026-08-07",
+      "page_count": 1,
+      "content_hash": "sha256:1fbba1a990bc6452dc09243493d720c4459a153a0c91b9b3fb6d3f288e4510e3",
+      "processing_status": "processed",
+      "synthetic_notice_visible": true
+    },
+    {
+      "document_id": "DOC-SYN-C-PAY-17",
+      "document_type": "payslip",
+      "file": "documents/payslip-2026-08-21.pdf",
+      "stated_issuer": "Synthetic Services Pty Ltd (unofficial synthetic fixture)",
+      "period_start": "2026-08-21",
+      "period_end": "2026-08-21",
+      "page_count": 1,
+      "content_hash": "sha256:1b2f2611e09d580716dca6b922baf0eb32959dffad927a0be3fad8f56c93d0b4",
+      "processing_status": "processed",
+      "synthetic_notice_visible": true
+    },
+    {
+      "document_id": "DOC-SYN-C-PAY-18",
+      "document_type": "payslip",
+      "file": "documents/payslip-2026-09-04.pdf",
+      "stated_issuer": "Synthetic Services Pty Ltd (unofficial synthetic fixture)",
+      "period_start": "2026-09-04",
+      "period_end": "2026-09-04",
+      "page_count": 1,
+      "content_hash": "sha256:9b9ede1abf8625e2defc21b267c06c6d524d6769230bbb3126f4414874c3a6d3",
+      "processing_status": "processed",
+      "synthetic_notice_visible": true
+    },
+    {
+      "document_id": "DOC-SYN-C-PAY-19",
+      "document_type": "payslip",
+      "file": "documents/payslip-2026-09-18.pdf",
+      "stated_issuer": "Synthetic Services Pty Ltd (unofficial synthetic fixture)",
+      "period_start": "2026-09-18",
+      "period_end": "2026-09-18",
+      "page_count": 1,
+      "content_hash": "sha256:29cb4b7c20acb76824ea12d7aed7c54f33a21f1118a88997bcb91810a84b48f8",
+      "processing_status": "processed",
+      "synthetic_notice_visible": true
+    }
+  ]
+}

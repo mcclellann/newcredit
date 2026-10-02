@@ -1,4 +1,7 @@
 export type ApplicationStatus =
+  | 'documents_required'
+  | 'processing'
+  | 'needs_review'
   | 'ready_to_submit'
   | 'submitted'
   | 'referred'
@@ -16,12 +19,12 @@ export type DocumentSummary = {
   issuer: string
   periodStart: string | null
   periodEnd: string | null
-  status: 'processed'
+  status: 'uploaded' | 'processing' | 'processed' | 'needs_review'
 }
 
 export type DemoApplication = {
   id: string
-  scenarioId: 'scenario-a' | 'scenario-b'
+  scenarioId: 'scenario-a' | 'scenario-b' | 'scenario-c'
   status: ApplicationStatus
   version: number
   fixedDemonstrationDate: string
@@ -56,7 +59,7 @@ export type DemoApplication = {
     classifiedTransactionCount: number
     documentChecksPassed: number
     transactionCategories: Array<{ category: string; count: number }>
-  }
+  } | null
 }
 
 export type Outcome = {
@@ -107,6 +110,9 @@ export const aud = (dollars: string): Money => {
 
 export function assertTransition(from: ApplicationStatus, to: ApplicationStatus): void {
   const allowed: Record<ApplicationStatus, ApplicationStatus[]> = {
+    documents_required: ['processing'],
+    processing: ['needs_review', 'ready_to_submit'],
+    needs_review: [],
     ready_to_submit: ['submitted', 'referred'],
     submitted: ['offer_accepted'],
     referred: [],

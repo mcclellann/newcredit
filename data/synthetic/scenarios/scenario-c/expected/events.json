@@ -1,0 +1,44 @@
+{
+  "audit_events": [
+    {
+      "sequence": 1,
+      "event_id": "AUD-SYN-C-001",
+      "type": "synthetic_consent_recorded",
+      "at": "2026-10-01T09:00:00+10:00"
+    },
+    {
+      "sequence": 2,
+      "event_id": "AUD-SYN-C-002",
+      "type": "documents_uploaded",
+      "at": "2026-10-01T09:10:00+10:00"
+    },
+    {
+      "sequence": 3,
+      "event_id": "AUD-SYN-C-003",
+      "type": "extraction_needs_review",
+      "at": "2026-10-01T09:12:00+10:00",
+      "reason_codes": [
+        "REQUIRED_LICENCE_FIELD_UNREADABLE"
+      ]
+    },
+    {
+      "sequence": 4,
+      "event_id": "AUD-SYN-C-004",
+      "type": "document_checks_need_review",
+      "at": "2026-10-01T09:13:00+10:00",
+      "reason_codes": [
+        "REQUIRED_STATEMENT_PERIOD_MISSING",
+        "REQUIRED_LICENCE_FIELD_UNREADABLE"
+      ]
+    },
+    {
+      "sequence": 5,
+      "event_id": "AUD-SYN-C-005",
+      "type": "application_review_required",
+      "at": "2026-10-01T09:13:01+10:00"
+    }
+  ],
+  "offer": null,
+  "disbursements": [],
+  "ledger": []
+}

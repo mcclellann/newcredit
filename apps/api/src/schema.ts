@@ -11,7 +11,7 @@ export const applications = sqliteTable('applications', {
   status: text('status').notNull(),
   version: integer('version').notNull(),
   snapshot: text('snapshot').notNull(),
-  outcomeSnapshot: text('outcome_snapshot').notNull(),
+  outcomeSnapshot: text('outcome_snapshot'),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
 })
@@ -47,3 +47,31 @@ export const applicationCorrections = sqliteTable('application_corrections', {
   currentValue: text('current_value').notNull(), applicationVersion: integer('application_version').notNull(),
   createdAt: text('created_at').notNull(),
 })
+
+export const documents = sqliteTable('documents', {
+  id: text('id').primaryKey(), applicationId: text('application_id').notNull().references(() => applications.id),
+  sourceHash: text('source_hash').notNull(), mediaType: text('media_type').notNull(), storageKey: text('storage_key').notNull(),
+  originalName: text('original_name').notNull(), documentType: text('document_type').notNull(), issuer: text('issuer').notNull(),
+  periodStart: text('period_start'), periodEnd: text('period_end'), status: text('status').notNull(),
+  createdAt: text('created_at').notNull(), updatedAt: text('updated_at').notNull(),
+}, (table) => [uniqueIndex('documents_application_hash_unique').on(table.applicationId, table.sourceHash)])
+
+export const documentChecks = sqliteTable('document_checks', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  applicationId: text('application_id').notNull().references(() => applications.id),
+  documentId: text('document_id').references(() => documents.id),
+  checkName: text('check_name').notNull(), status: text('status').notNull(),
+  details: text('details').notNull(), data: text('data').notNull(),
+})
+
+export const extractedFields = sqliteTable('extracted_fields', {
+  id: text('id').primaryKey(), applicationId: text('application_id').notNull().references(() => applications.id),
+  documentId: text('document_id').notNull().references(() => documents.id), fieldName: text('field_name').notNull(),
+  rawValue: text('raw_value').notNull(), normalizedValue: text('normalized_value'), confidence: text('confidence').notNull(),
+  sourceLocation: text('source_location').notNull(), reviewRequired: integer('review_required').notNull().default(0),
+})
+
+export const applicationAuditEvents = sqliteTable('application_audit_events', {
+  id: text('id').primaryKey(), applicationId: text('application_id').notNull().references(() => applications.id),
+  sequence: integer('sequence').notNull(), type: text('type').notNull(), at: text('at').notNull(), details: text('details').notNull(),
+}, (table) => [uniqueIndex('application_audit_events_sequence_unique').on(table.applicationId, table.sequence)])

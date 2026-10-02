@@ -66,7 +66,7 @@ def write_fit(c: canvas.Canvas, text: str, x: float, y: float, max_width: float,
     c.drawString(x, y, text)
 
 
-def draw_licence(base: Path, customer: dict) -> None:
+def draw_licence(base: Path, customer: dict, unreadable_fields: set[str]) -> None:
     path = base / "documents" / "drivers-licence.pdf"
     width, height = landscape((500, 315))
     c = pdf_canvas(path, (width, height))
@@ -104,7 +104,14 @@ def draw_licence(base: Path, customer: dict) -> None:
         c.setFont("Helvetica-Bold", 6.5)
         c.drawString(x, y, label)
         c.setFillColor(INK)
-        write_fit(c, value, x, y - 15, max_width, "Helvetica-Bold", 10)
+        if label == "LICENCE NO." and "licence_number" in unreadable_fields:
+            c.setFillColor(colors.HexColor("#66717C"))
+            c.roundRect(x, y - 19, 132, 18, 2, fill=1, stroke=0)
+            c.setFillColor(colors.white)
+            c.setFont("Helvetica-Bold", 7)
+            c.drawCentredString(x + 66, y - 14, "DELIBERATELY UNREADABLE")
+        else:
+            write_fit(c, value, x, y - 15, max_width, "Helvetica-Bold", 10)
 
     c.setFillColor(RED)
     c.setFont("Helvetica-Bold", 8)
@@ -324,8 +331,15 @@ def generate_scenario(base: Path) -> None:
     with (base / "transactions" / "normalized.csv").open(newline="") as file:
         transactions = list(csv.DictReader(file))
 
+    checks = load(base / "documents" / "check-results.json")["results"]
+    unreadable_fields = {
+        result["field_name"]
+        for result in checks
+        if result.get("check") == "field_readability"
+        and result.get("status") == "needs_review"
+    }
     if customer["licence_number"]:
-        draw_licence(base, customer)
+        draw_licence(base, customer, unreadable_fields)
 
     statement_items = [item for item in manifest["documents"] if item["document_type"] == "bank_statement"]
     for item in statement_items:
@@ -346,7 +360,7 @@ def generate_scenario(base: Path) -> None:
 
 
 def main() -> None:
-    for name in ("scenario-a", "scenario-b"):
+    for name in ("scenario-a", "scenario-b", "scenario-c"):
         generate_scenario(SCENARIOS / name)
     print("Generated synthetic documents and refreshed manifest hashes.")
 

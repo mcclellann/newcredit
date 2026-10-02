@@ -1,0 +1,36 @@
+{
+  "method": "independently total normalized labelled rows; transfer pairs excluded",
+  "summaries": [
+    {
+      "month": "2026-08",
+      "account_id": "ACCT-SYN-C1",
+      "opening_balance": "5300.12",
+      "credits": "6000.00",
+      "debits": "3266.72",
+      "closing_balance": "8033.40",
+      "net_cash_flow": "2733.28",
+      "internal_transfers_excluded": "0.00"
+    },
+    {
+      "month": "2026-09",
+      "account_id": "ACCT-SYN-C1",
+      "opening_balance": "8033.40",
+      "credits": "6000.00",
+      "debits": "3399.91",
+      "closing_balance": "10633.49",
+      "net_cash_flow": "2600.09",
+      "internal_transfers_excluded": "0.00"
+    }
+  ],
+  "coverage_status": "incomplete",
+  "required_period": {
+    "start": "2026-07-01",
+    "end": "2026-09-30"
+  },
+  "missing_periods": [
+    {
+      "start": "2026-07-01",
+      "end": "2026-07-31"
+    }
+  ]
+}

@@ -57,3 +57,51 @@ describe('Existing customer journey', () => {
     expect(screen.queryByRole('button', { name: /review simulated offer/i })).not.toBeInTheDocument()
   })
 })
+
+describe('Document review journey', () => {
+  const application = { id: 'app-c', scenarioId: 'scenario-c', status: 'documents_required', version: 1, fixedDemonstrationDate: '2026-10-01', customer: { type: 'new', name: 'Casey Fiction' }, documents: [], review: null }
+  const documents = Array.from({ length: 7 }, (_, index) => ({ id: `doc-${index}`, applicationId: 'app-c', sourceHash: `${index}`, mediaType: 'application/pdf', originalName: `${index}.pdf`, type: index < 2 ? 'bank_statement' : index === 2 ? 'drivers_licence' : 'payslip', issuer: 'Synthetic issuer', periodStart: '2026-08-01', periodEnd: '2026-08-31', status: 'uploaded', createdAt: '', updatedAt: '' }))
+
+  it('offers the choice and shows intake requirements and seven staged documents', async () => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
+      const url = String(input)
+      if (url.endsWith('/demo-scenarios')) return new Response(JSON.stringify({ scenarios: [] }), { status: 200 })
+      if (url.endsWith('/applications/app-c')) return new Response(JSON.stringify(application), { status: 200 })
+      if (url.endsWith('/applications/app-c/documents/stage-demo')) {
+        expect(new Headers(init?.headers).has('Content-Type')).toBe(false)
+        return new Response(JSON.stringify({ documents }), { status: 200 })
+      }
+      return new Response(JSON.stringify({ documents: [] }), { status: 200 })
+    })
+    renderAt('/')
+    await waitFor(() => expect(screen.getByRole('button', { name: /document review example/i })).toBeEnabled())
+    cleanup(); renderAt('/applications/app-c/documents')
+    expect(await screen.findByRole('heading', { name: /Casey Fiction’s documents/i })).toBeInTheDocument()
+    expect(screen.getByText(/three months of statements/i)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /use prepared synthetic document pack/i }))
+    expect(await screen.findByText('7 of 7 documents uploaded')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /process documents/i })).toBeEnabled()
+  })
+
+  it('shows exactly two blockers, licence provenance, and no outcome actions', async () => {
+    const statementBlocker = { documentId: null, check: 'required_statement_coverage', status: 'needs_review', details: 'July statement absent.', data: { account_id: 'ACCT-SYN-C1', missing_periods: [{ start: '2026-07-01', end: '2026-07-31' }] } }
+    const licenceBlocker = { documentId: 'lic', check: 'field_readability', status: 'needs_review', details: 'Licence number region is deliberately obscured.', data: { field_name: 'licence_number' } }
+    const review = { status: 'needs_review', checks: [statementBlocker, licenceBlocker], blockers: [statementBlocker, licenceBlocker], extractedFields: [{ id: 'f', documentId: 'lic', fieldName: 'licence_number', rawValue: '[UNREADABLE]', normalizedValue: null, confidence: '0.12', sourceLocation: { page: 1, line: 'Licence' }, reviewRequired: true }], auditEvents: [] }
+    const processedDocuments = documents.map((document, index) => ({ ...document, status: index === 2 ? 'needs_review' : 'processed' }))
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async input => new Response(JSON.stringify(String(input).endsWith('/document-review') ? review : { ...application, status: 'needs_review', version: 2, documents: processedDocuments }), { status: 200 }))
+    renderAt('/applications/app-c/document-review')
+    expect(await screen.findByRole('heading', { name: 'Two items need attention' })).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: '2 blockers' }).querySelectorAll('article')).toHaveLength(2)
+    expect(screen.getByRole('heading', { name: 'July 2026 statement is missing' })).toBeInTheDocument()
+    expect(screen.getByText('ACCT-SYN-C1')).toBeInTheDocument()
+    expect(screen.getByText(/1 July 2026–31 July 2026/)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Licence number is unreadable' })).toBeInTheDocument()
+    expect(screen.getByText('[UNREADABLE]')).toBeInTheDocument()
+    expect(screen.getByText('Unavailable (null)')).toBeInTheDocument()
+    expect(screen.getByText('12%')).toBeInTheDocument()
+    expect(screen.getByText('Page 1 / Licence')).toBeInTheDocument()
+    expect(screen.getByText('6')).toBeInTheDocument()
+    expect(screen.getByText('Document needs review').parentElement).toHaveTextContent('1Document needs review')
+    expect(screen.queryByRole('button', { name: /submit|offer/i })).not.toBeInTheDocument()
+  })
+})

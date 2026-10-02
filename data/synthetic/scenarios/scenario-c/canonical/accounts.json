@@ -1,0 +1,27 @@
+{
+  "accounts": [
+    {
+      "account_id": "ACCT-SYN-C1",
+      "customer_id": "CUST-SYN-003",
+      "account_type": "transaction",
+      "ownership": "sole",
+      "applicant_share": "1.00",
+      "bsb_masked": "\u2022\u2022\u2022-901",
+      "account_masked": "\u2022\u2022\u2022\u20221847",
+      "currency": "AUD",
+      "coverage_start": "2026-08-01",
+      "coverage_end": "2026-09-30",
+      "active": true,
+      "active_during_required_period": true,
+      "required_coverage_start": "2026-07-01",
+      "required_coverage_end": "2026-09-30",
+      "coverage_status": "incomplete",
+      "missing_periods": [
+        {
+          "start": "2026-07-01",
+          "end": "2026-07-31"
+        }
+      ]
+    }
+  ]
+}
