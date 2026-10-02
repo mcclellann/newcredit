@@ -83,6 +83,12 @@
                                 "enum": [
                                   "scenario-c"
                                 ]
+                              },
+                              {
+                                "type": "string",
+                                "enum": [
+                                  "scenario-h"
+                                ]
                               }
                             ]
                           },
@@ -150,9 +156,19 @@
                 ],
                 "properties": {
                   "scenarioId": {
-                    "type": "string",
-                    "enum": [
-                      "scenario-b"
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "scenario-b"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          "scenario-h"
+                        ]
+                      }
                     ]
                   }
                 }
@@ -176,9 +192,19 @@
                   ],
                   "properties": {
                     "scenarioId": {
-                      "type": "string",
-                      "enum": [
-                        "scenario-b"
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "scenario-b"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "scenario-h"
+                          ]
+                        }
                       ]
                     },
                     "customerReference": {
@@ -239,6 +265,12 @@
                         "enum": [
                           "scenario-c"
                         ]
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          "scenario-h"
+                        ]
                       }
                     ]
                   }
@@ -290,6 +322,12 @@
                           "enum": [
                             "scenario-c"
                           ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "scenario-h"
+                          ]
                         }
                       ]
                     },
@@ -329,6 +367,12 @@
                           "type": "string",
                           "enum": [
                             "referred"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "not_approved"
                           ]
                         },
                         {
@@ -834,6 +878,12 @@
                           "enum": [
                             "scenario-c"
                           ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "scenario-h"
+                          ]
                         }
                       ]
                     },
@@ -873,6 +923,12 @@
                           "type": "string",
                           "enum": [
                             "referred"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "not_approved"
                           ]
                         },
                         {
@@ -1790,6 +1846,12 @@
                           "enum": [
                             "scenario-c"
                           ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "scenario-h"
+                          ]
                         }
                       ]
                     },
@@ -1829,6 +1891,12 @@
                           "type": "string",
                           "enum": [
                             "referred"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "not_approved"
                           ]
                         },
                         {
@@ -2725,6 +2793,12 @@
                           "enum": [
                             "scenario-c"
                           ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "scenario-h"
+                          ]
                         }
                       ]
                     },
@@ -2764,6 +2838,12 @@
                           "type": "string",
                           "enum": [
                             "referred"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "not_approved"
                           ]
                         },
                         {
@@ -3261,6 +3341,12 @@
                           "enum": [
                             "referred"
                           ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "not_approved"
+                          ]
                         }
                       ]
                     },
@@ -3280,13 +3366,29 @@
                           "enum": [
                             "moderate"
                           ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "high"
+                          ]
                         }
                       ]
                     },
                     "affordability": {
-                      "type": "string",
-                      "enum": [
-                        "affordable"
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "affordable"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "unaffordable"
+                          ]
+                        }
                       ]
                     },
                     "monthlySurplus": {

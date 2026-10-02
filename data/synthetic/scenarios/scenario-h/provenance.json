@@ -1,0 +1,7 @@
+{
+  "scenario_id": "H",
+  "declaration": "All data in this scenario was deliberately invented and authored for NewCredit. It was not copied from any real person, account, employer document, licence, or financial statement.",
+  "authoring_date": "2026-10-01", "fixed_demonstration_date": "2026-10-01",
+  "conventions": ["SYN-prefixed generated identifiers", "example.com email", "ACMA-reserved 0491 570 313 creative-work phone number", "fictional streets and personal identifiers; real employer name used only as clearly unofficial synthetic context", "masked account and non-government licence pattern"],
+  "reviewer": null, "reviewed_at": null, "review_status": "pending_owner_review"
+}

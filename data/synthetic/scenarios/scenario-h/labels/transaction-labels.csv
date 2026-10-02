@@ -1,0 +1,30 @@
+transaction_id,category,confidence,method,annotator_rationale,ambiguity_flag,allowed_alternative,second_review_required,review_status
+TXN-SYN-H-001,income.salary,0.99,independent-human-label-v1,Unambiguous payroll text,false,,false,pending_owner_review
+TXN-SYN-H-002,expense.housing,0.99,independent-human-label-v1,Recurring rent text,false,,false,pending_owner_review
+TXN-SYN-H-003,expense.debt_repayment,0.99,independent-human-label-v1,Recurring liability record match,false,,false,pending_owner_review
+TXN-SYN-H-004,expense.groceries,0.99,independent-human-label-v1,Unambiguous merchant and amount,false,,false,pending_owner_review
+TXN-SYN-H-005,expense.dishonour_fee,0.99,independent-human-label-v1,Explicit payment-stress fee,false,,true,pending_owner_review
+TXN-SYN-H-006,income.salary,0.99,independent-human-label-v1,Unambiguous payroll text,false,,false,pending_owner_review
+TXN-SYN-H-007,expense.utilities,0.99,independent-human-label-v1,Unambiguous utility text,false,,false,pending_owner_review
+TXN-SYN-H-008,expense.transport,0.99,independent-human-label-v1,Unambiguous transport text,false,,false,pending_owner_review
+TXN-SYN-H-009,expense.other,0.99,independent-human-label-v1,General household purchase,false,,false,pending_owner_review
+TXN-SYN-H-010,expense.dishonour_fee,0.99,independent-human-label-v1,Explicit payment-stress fee,false,,true,pending_owner_review
+TXN-SYN-H-011,expense.housing,0.99,independent-human-label-v1,Recurring rent text,false,,false,pending_owner_review
+TXN-SYN-H-012,expense.dishonour_fee,0.99,independent-human-label-v1,Explicit payment-stress fee,false,,true,pending_owner_review
+TXN-SYN-H-013,expense.debt_repayment,0.99,independent-human-label-v1,Recurring liability record match,false,,false,pending_owner_review
+TXN-SYN-H-014,income.salary,0.99,independent-human-label-v1,Matches payslip net pay,false,,false,pending_owner_review
+TXN-SYN-H-015,expense.groceries,0.99,independent-human-label-v1,Unambiguous merchant and amount,false,,false,pending_owner_review
+TXN-SYN-H-016,expense.utilities,0.99,independent-human-label-v1,Unambiguous utility text,false,,false,pending_owner_review
+TXN-SYN-H-017,expense.transport,0.99,independent-human-label-v1,Unambiguous transport text,false,,false,pending_owner_review
+TXN-SYN-H-018,income.salary,0.99,independent-human-label-v1,Matches payslip net pay,false,,false,pending_owner_review
+TXN-SYN-H-019,expense.other,0.99,independent-human-label-v1,General household purchase,false,,false,pending_owner_review
+TXN-SYN-H-020,expense.dishonour_fee,0.99,independent-human-label-v1,Explicit payment-stress fee,false,,true,pending_owner_review
+TXN-SYN-H-021,expense.housing,0.99,independent-human-label-v1,Recurring rent text,false,,false,pending_owner_review
+TXN-SYN-H-022,income.salary,0.99,independent-human-label-v1,Matches payslip net pay,false,,false,pending_owner_review
+TXN-SYN-H-023,expense.debt_repayment,0.99,independent-human-label-v1,Recurring liability record match,false,,false,pending_owner_review
+TXN-SYN-H-024,expense.groceries,0.99,independent-human-label-v1,Unambiguous merchant and amount,false,,false,pending_owner_review
+TXN-SYN-H-025,expense.dishonour_fee,0.99,independent-human-label-v1,Explicit payment-stress fee,false,,true,pending_owner_review
+TXN-SYN-H-026,expense.utilities,0.99,independent-human-label-v1,Unambiguous utility text,false,,false,pending_owner_review
+TXN-SYN-H-027,income.salary,0.99,independent-human-label-v1,Matches payslip net pay,false,,false,pending_owner_review
+TXN-SYN-H-028,expense.transport,0.99,independent-human-label-v1,Unambiguous transport text,false,,false,pending_owner_review
+TXN-SYN-H-029,expense.other,0.99,independent-human-label-v1,General household purchase,false,,false,pending_owner_review

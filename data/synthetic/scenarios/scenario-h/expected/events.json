@@ -1,0 +1,15 @@
+{
+  "audit_events": [
+    { "sequence": 1, "event_id": "AUD-SYN-H-001", "type": "simulated_login_completed", "at": "2026-10-01T09:00:00+09:30" },
+    { "sequence": 2, "event_id": "AUD-SYN-H-002", "type": "profile_loaded", "at": "2026-10-01T09:01:00+09:30" },
+    { "sequence": 3, "event_id": "AUD-SYN-H-003", "type": "profile_confirmed", "at": "2026-10-01T09:05:00+09:30" },
+    { "sequence": 4, "event_id": "AUD-SYN-H-004", "type": "documents_uploaded", "at": "2026-10-01T09:08:00+09:30" },
+    { "sequence": 5, "event_id": "AUD-SYN-H-005", "type": "document_checks_passed", "at": "2026-10-01T09:10:00+09:30" },
+    { "sequence": 6, "event_id": "AUD-SYN-H-006", "type": "applicant_confirmed", "at": "2026-10-01T09:20:00+09:30" },
+    { "sequence": 7, "event_id": "AUD-SYN-H-007", "type": "application_submitted", "at": "2026-10-01T09:21:00+09:30" },
+    { "sequence": 8, "event_id": "AUD-SYN-H-008", "type": "risk_scored_not_approved", "at": "2026-10-01T09:21:05+09:30" }
+  ],
+  "offer": null, "disbursements": [], "transfer_reference": null, "ledger_movements": [],
+  "blocked_reason": "UNAFFORDABLE_AND_HIGH_RISK", "completed_funds_movement_events": 0,
+  "simulation_notice": "No offer was created or accepted; no transfer reference, ledger movement, disbursement, or money transfer exists."
+}

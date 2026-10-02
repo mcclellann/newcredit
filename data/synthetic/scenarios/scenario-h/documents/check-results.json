@@ -1,0 +1,14 @@
+{
+  "check_version": "document-check-fixture-v1",
+  "results": [
+    { "document_id": "DOC-SYN-H-LICENCE", "check": "field_readability", "field_name": "licence_number", "status": "passed", "details": "Synthetic licence number is readable and matches the canonical customer." },
+    { "document_id": "DOC-SYN-H-STMT-07", "check": "statement_reconciliation", "status": "passed", "details": "1600.00 + 5000.00 - 5580.00 = 1020.00" },
+    { "document_id": "DOC-SYN-H-STMT-08", "check": "statement_reconciliation", "status": "passed", "details": "1020.00 + 5000.00 - 5725.00 = 295.00" },
+    { "document_id": "DOC-SYN-H-STMT-09", "check": "statement_reconciliation", "status": "passed", "details": "295.00 + 5000.00 - 5795.00 = -500.00" },
+    { "document_id": "DOC-SYN-H-PAY-01", "check": "pay_arithmetic", "status": "passed", "details": "3300.00 - 800.00 = 2500.00" },
+    { "document_id": "DOC-SYN-H-PAY-02", "check": "pay_arithmetic", "status": "passed", "details": "3300.00 - 800.00 = 2500.00" },
+    { "document_id": "DOC-SYN-H-PAY-03", "check": "pay_arithmetic", "status": "passed", "details": "3300.00 - 800.00 = 2500.00" },
+    { "document_id": "DOC-SYN-H-PAY-04", "check": "pay_arithmetic", "status": "passed", "details": "3300.00 - 800.00 = 2500.00" },
+    { "document_id": "SCENARIO-H-DOCUMENT-SET", "check": "required_period_completeness", "status": "passed", "details": "All active accounts have July, August, and September statements; every fortnightly pay date from 1 August through 30 September is supplied." }
+  ]
+}

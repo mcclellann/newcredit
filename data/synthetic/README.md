@@ -28,3 +28,9 @@ The scenario manifest defines the first eight customer packs. Scenarios A, B,
 and C are owner-approved implementation baselines. Scenario C is the deterministic
 `needs_review` document-intake baseline: its missing July statement and unreadable
 licence number block scoring, outcome, offer creation, and funds movement.
+
+Scenario H is a deterministic, pending-owner-review high-risk baseline for an
+existing NT customer. It has complete document periods, sustained negative
+external cash flow, high debt service, an unaffordable 19% assessment, no pricing
+tier or offer, and no disbursement or ledger movement. Its `review.md` and
+provenance deliberately remain `pending_owner_review` until an owner signs off.

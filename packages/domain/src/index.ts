@@ -5,6 +5,7 @@ export type ApplicationStatus =
   | 'ready_to_submit'
   | 'submitted'
   | 'referred'
+  | 'not_approved'
   | 'offer_accepted'
   | 'funded'
 
@@ -24,7 +25,7 @@ export type DocumentSummary = {
 
 export type DemoApplication = {
   id: string
-  scenarioId: 'scenario-a' | 'scenario-b' | 'scenario-c'
+  scenarioId: 'scenario-a' | 'scenario-b' | 'scenario-c' | 'scenario-h'
   status: ApplicationStatus
   version: number
   fixedDemonstrationDate: string
@@ -64,10 +65,10 @@ export type DemoApplication = {
 
 export type Outcome = {
   applicationId: string
-  decision: 'indicatively_approved' | 'referred'
+  decision: 'indicatively_approved' | 'referred' | 'not_approved'
   riskScore: number
-  riskBand: 'very_low' | 'moderate'
-  affordability: 'affordable'
+  riskBand: 'very_low' | 'moderate' | 'high'
+  affordability: 'affordable' | 'unaffordable'
   monthlySurplus: Money
   reasons: string[]
   factors: Array<{ factor: string; signal: string; riskValue: number }>
@@ -99,11 +100,11 @@ export type Disbursement = {
 }
 
 export const aud = (dollars: string): Money => {
-  const match = /^(\d+)(?:\.(\d{1,2}))?$/.exec(dollars)
+  const match = /^(-?)(\d+)(?:\.(\d{1,2}))?$/.exec(dollars)
   if (!match) throw new Error(`Invalid AUD amount: ${dollars}`)
-  const [, whole, fraction = ''] = match
+  const [, sign, whole, fraction = ''] = match
   return {
-    amountMinor: Number(whole) * 100 + Number(fraction.padEnd(2, '0')),
+    amountMinor: (sign === '-' ? -1 : 1) * (Number(whole) * 100 + Number(fraction.padEnd(2, '0'))),
     currency: 'AUD',
   }
 }
@@ -113,9 +114,10 @@ export function assertTransition(from: ApplicationStatus, to: ApplicationStatus)
     documents_required: ['processing'],
     processing: ['needs_review', 'ready_to_submit'],
     needs_review: [],
-    ready_to_submit: ['submitted', 'referred'],
+    ready_to_submit: ['submitted', 'referred', 'not_approved'],
     submitted: ['offer_accepted'],
     referred: [],
+    not_approved: [],
     offer_accepted: ['funded'],
     funded: [],
   }

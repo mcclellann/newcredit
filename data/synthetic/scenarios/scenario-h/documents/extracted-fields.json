@@ -1,0 +1,20 @@
+{
+  "extraction_version": "fixture-expected-v1",
+  "fields": [
+    { "field_id": "EF-H-LIC-NO", "document_id": "DOC-SYN-H-LICENCE", "field_name": "licence_number", "raw_value": "SYNNT00842", "normalized_value": "SYNNT00842", "confidence": "0.99", "source_location": { "page": 1, "line": "LICENCE NO." } },
+    { "field_id": "EF-H-07-OPEN", "document_id": "DOC-SYN-H-STMT-07", "field_name": "opening_balance", "raw_value": "AUD 1600.00", "normalized_value": "1600.00", "confidence": "0.99", "source_location": { "page": 1, "line": "opening balance" } },
+    { "field_id": "EF-H-07-CLOSE", "document_id": "DOC-SYN-H-STMT-07", "field_name": "closing_balance", "raw_value": "AUD 1020.00", "normalized_value": "1020.00", "confidence": "0.99", "source_location": { "page": 1, "line": "closing balance" } },
+    { "field_id": "EF-H-08-OPEN", "document_id": "DOC-SYN-H-STMT-08", "field_name": "opening_balance", "raw_value": "AUD 1020.00", "normalized_value": "1020.00", "confidence": "0.99", "source_location": { "page": 1, "line": "opening balance" } },
+    { "field_id": "EF-H-08-CLOSE", "document_id": "DOC-SYN-H-STMT-08", "field_name": "closing_balance", "raw_value": "AUD 295.00", "normalized_value": "295.00", "confidence": "0.99", "source_location": { "page": 1, "line": "closing balance" } },
+    { "field_id": "EF-H-09-OPEN", "document_id": "DOC-SYN-H-STMT-09", "field_name": "opening_balance", "raw_value": "AUD 295.00", "normalized_value": "295.00", "confidence": "0.99", "source_location": { "page": 1, "line": "opening balance" } },
+    { "field_id": "EF-H-09-CLOSE", "document_id": "DOC-SYN-H-STMT-09", "field_name": "closing_balance", "raw_value": "AUD -500.00", "normalized_value": "-500.00", "confidence": "0.99", "source_location": { "page": 1, "line": "closing balance" } },
+    { "field_id": "EF-H-P01-GROSS", "document_id": "DOC-SYN-H-PAY-01", "field_name": "gross_pay", "raw_value": "AUD 3300.00", "normalized_value": "3300.00", "confidence": "0.99", "source_location": { "page": 1, "line": "Gross pay" } },
+    { "field_id": "EF-H-P01-NET", "document_id": "DOC-SYN-H-PAY-01", "field_name": "net_pay", "raw_value": "AUD 2500.00", "normalized_value": "2500.00", "confidence": "0.99", "source_location": { "page": 1, "line": "Net pay" } },
+    { "field_id": "EF-H-P02-GROSS", "document_id": "DOC-SYN-H-PAY-02", "field_name": "gross_pay", "raw_value": "AUD 3300.00", "normalized_value": "3300.00", "confidence": "0.99", "source_location": { "page": 1, "line": "Gross pay" } },
+    { "field_id": "EF-H-P02-NET", "document_id": "DOC-SYN-H-PAY-02", "field_name": "net_pay", "raw_value": "AUD 2500.00", "normalized_value": "2500.00", "confidence": "0.99", "source_location": { "page": 1, "line": "Net pay" } },
+    { "field_id": "EF-H-P03-GROSS", "document_id": "DOC-SYN-H-PAY-03", "field_name": "gross_pay", "raw_value": "AUD 3300.00", "normalized_value": "3300.00", "confidence": "0.99", "source_location": { "page": 1, "line": "Gross pay" } },
+    { "field_id": "EF-H-P03-NET", "document_id": "DOC-SYN-H-PAY-03", "field_name": "net_pay", "raw_value": "AUD 2500.00", "normalized_value": "2500.00", "confidence": "0.99", "source_location": { "page": 1, "line": "Net pay" } },
+    { "field_id": "EF-H-P04-GROSS", "document_id": "DOC-SYN-H-PAY-04", "field_name": "gross_pay", "raw_value": "AUD 3300.00", "normalized_value": "3300.00", "confidence": "0.99", "source_location": { "page": 1, "line": "Gross pay" } },
+    { "field_id": "EF-H-P04-NET", "document_id": "DOC-SYN-H-PAY-04", "field_name": "net_pay", "raw_value": "AUD 2500.00", "normalized_value": "2500.00", "confidence": "0.99", "source_location": { "page": 1, "line": "Net pay" } }
+  ]
+}

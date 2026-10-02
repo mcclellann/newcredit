@@ -1,0 +1,10 @@
+{
+  "application_id": "APP-SYN-H",
+  "entries": [
+    { "id": "FP-H-IN", "kind": "income", "subtype": "salary", "description": "Stable continuing verified salary", "amount": "5000.00", "currency": "AUD", "frequency": "monthly", "normalized_monthly": "5000.00", "effective_date": "2026-10-01", "source": "document", "verification_status": "verified" },
+    { "id": "FP-H-H", "kind": "expense", "subtype": "housing", "description": "Rent", "amount": "1200.00", "currency": "AUD", "frequency": "monthly", "normalized_monthly": "1200.00", "effective_date": "2026-10-01", "source": "transaction", "verification_status": "verified" },
+    { "id": "FP-H-G", "kind": "expense", "subtype": "general_living", "description": "Verified comparable general living three-month average", "amount": "2300.00", "currency": "AUD", "frequency": "monthly", "normalized_monthly": "2300.00", "effective_date": "2026-10-01", "source": "transaction", "verification_status": "verified" },
+    { "id": "FP-H-L", "kind": "liability", "subtype": "personal_loan", "description": "Fictional high-service debt facility", "creditor": "Territory Example Finance (fictional)", "outstanding_balance": "32784.19", "amount": "2200.00", "currency": "AUD", "frequency": "monthly", "normalized_monthly": "2200.00", "effective_date": "2026-10-01", "source": "customer_record_and_transaction", "verification_status": "verified" },
+    { "id": "FP-H-OD", "kind": "liability", "subtype": "overdrawn_account", "description": "Overdrawn closing transaction account balance", "creditor": "Nick's Bank (fictional)", "outstanding_balance": "500.00", "amount": "0.00", "currency": "AUD", "frequency": null, "normalized_monthly": "0.00", "effective_date": "2026-09-30", "source": "document", "verification_status": "verified" }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "score_version": "credit-risk-v0.1", "input_period": { "start": "2026-07-01", "end": "2026-09-30" }, "frozen_at_assessment_rate": "0.19",
+  "factors": [
+    { "factor": "post_loan_capacity", "raw": "assessment surplus ratio -23.6986%", "risk_value": 100, "weight": "0.25", "weighted_value": "25.00" },
+    { "factor": "payment_stress", "raw": "5 dishonour/overdrawn-item fee events", "risk_value": 100, "weight": "0.20", "weighted_value": "20.00" },
+    { "factor": "existing_debt_burden", "raw": "2200.00 / 5000.00 = 44.0000%", "risk_value": 100, "weight": "0.15", "weighted_value": "15.00" },
+    { "factor": "cash_flow_balance_stability", "raw": "external net cash flow negative in all three months; negative balances observed", "risk_value": 100, "weight": "0.15", "weighted_value": "15.00" },
+    { "factor": "income_stability", "raw": "0.0000% required-payslip range variation; continuing", "risk_value": 0, "weight": "0.10", "weighted_value": "0.00" },
+    { "factor": "gambling_activity", "raw": "0 events; 0.00% of net income", "risk_value": 0, "weight": "0.10", "weighted_value": "0.00" },
+    { "factor": "short_term_credit_use", "raw": "0 repayment events", "risk_value": 0, "weight": "0.05", "weighted_value": "0.00" }
+  ],
+  "composite_risk": "75.00", "score_formula": "round(1 + 9.99 * 75.00)", "score": 750, "band": "high",
+  "pricing_tier": "no_offer", "offered_rate": null, "affordability": "unaffordable", "decision": "not_approved", "outcome": "not_approved",
+  "reason_codes": ["UNAFFORDABLE_NEGATIVE_SURPLUS", "HIGH_RISK_SCORE", "HIGH_EXISTING_DEBT_BURDEN", "SUSTAINED_NEGATIVE_EXTERNAL_CASH_FLOW", "PAYMENT_STRESS_OBSERVED"],
+  "principal_adverse_factors": ["post_loan_capacity", "payment_stress", "existing_debt_burden"],
+  "material_positive_factors": ["stable_continuing_income", "no_gambling_or_short_term_credit_observed"], "illustrative_not_offer": true
+}

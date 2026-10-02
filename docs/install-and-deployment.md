@@ -1,13 +1,14 @@
 # Installation and Deployment
 
-**Status:** Scenario A, B, and C development workflows implemented; production packaging remains planned
+**Status:** Scenario A, B, C, and H development workflows implemented; production packaging remains planned
 
 **Targets:** Windows 11 with WSL2, and native macOS
 
 ## 1. Current repository status
 
-The repository contains working Scenario A, B, and C web/API vertical slices,
-including persisted synthetic document intake and review-required processing.
+The repository contains working Scenario A, B, C, and H web/API vertical slices,
+including persisted synthetic document intake, review-required processing, and
+an unaffordable high-risk outcome that blocks offers and funding.
 Dependency installation, build, tests, SQLite migration, OpenAPI generation,
 and local development commands are implemented and exercised in an Amp Linux
 orb. Clean checkout verification on Windows/WSL2 and native macOS remains

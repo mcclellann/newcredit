@@ -19,6 +19,7 @@ describe('Scenario A applicant journey', () => {
     expect(screen.getByText(/synthetic data only/i)).toBeInTheDocument()
     await waitFor(() => expect(screen.getByRole('button', { name: /new customer/i })).toBeEnabled())
     expect(screen.getByRole('button', { name: /existing customer/i })).toBeEnabled()
+    expect(screen.getByRole('button', { name: /high-risk outcome example/i })).toBeEnabled()
   })
 
   it('shows the submitted indicative outcome from the API', async () => {
@@ -44,6 +45,23 @@ describe('Existing customer journey', () => {
     expect(screen.getByText(/not production authentication/i)).toBeInTheDocument()
   })
 
+  it('selects Taylor’s Scenario H profile and application through simulated login', async () => {
+    const requests: Array<{ url: string; body: string | null }> = []
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
+      requests.push({ url: String(input), body: init?.body as string ?? null })
+      if (String(input).endsWith('/demo-sessions/login')) return new Response(JSON.stringify({ scenarioId: 'scenario-h', customerReference: 'EXIST-SYN-H-808', customerName: 'Taylor Example', simulated: true, notice: 'Demonstration login only; this is not production authentication.' }), { status: 200 })
+      return new Response(JSON.stringify({ id: 'app-h' }), { status: 200 })
+    })
+    renderAt('/login?scenario=scenario-h')
+    expect(screen.getByText(/load Taylor Example’s synthetic customer profile/i)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /log in to demo profile/i }))
+    expect(await screen.findByText('Taylor Example')).toBeInTheDocument()
+    expect(JSON.parse(requests[0].body!)).toEqual({ scenarioId: 'scenario-h' })
+    fireEvent.click(screen.getByRole('button', { name: /continue with this profile/i }))
+    await waitFor(() => expect(requests).toHaveLength(2))
+    expect(JSON.parse(requests[1].body!)).toEqual({ scenarioId: 'scenario-h' })
+  })
+
   it('shows referral as a terminal outcome without an offer action', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({
       applicationId: 'app-b', decision: 'referred', riskScore: 488, riskBand: 'moderate', affordability: 'affordable',
@@ -55,6 +73,32 @@ describe('Existing customer journey', () => {
     expect(screen.getByText('488')).toBeInTheDocument()
     expect(screen.getByText(/no offer or funds movement is available/i)).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /review simulated offer/i })).not.toBeInTheDocument()
+  })
+
+  it('shows a respectful terminal not-approved outcome with negative capacity', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({
+      applicationId: 'app-h', decision: 'not_approved', riskScore: 750, riskBand: 'high', affordability: 'unaffordable',
+      monthlySurplus: { amountMinor: -118493, currency: 'AUD' }, reasons: ['UNAFFORDABLE_NEGATIVE_SURPLUS', 'HIGH_RISK_SCORE', 'HIGH_EXISTING_DEBT_BURDEN', 'SUSTAINED_NEGATIVE_EXTERNAL_CASH_FLOW', 'PAYMENT_STRESS_OBSERVED'],
+      factors: [
+        { factor: 'payment_stress', signal: '5 dishonour/overdrawn-item fee events', riskValue: 100 },
+        { factor: 'existing_debt_burden', signal: '2200.00 / 5000.00 = 44.0000%', riskValue: 100 },
+        { factor: 'cash_flow_balance_stability', signal: 'external net cash flow negative in all three months; negative balances observed', riskValue: 100 },
+        { factor: 'income_stability', signal: '0.0000% required-payslip range variation; continuing', riskValue: 0 },
+      ], illustrativeNotOffer: true,
+    }), { status: 200 }))
+    renderAt('/applications/app-h/outcome')
+    expect(await screen.findByRole('heading', { name: /application is not approved/i })).toBeInTheDocument()
+    expect(screen.getByText('750')).toBeInTheDocument()
+    expect(screen.getByText(/high risk band/i)).toBeInTheDocument()
+    expect(screen.getByText(/unaffordable/i)).toBeInTheDocument()
+    expect(screen.getByText(/−\$1,184\.93 estimated monthly capacity/)).toBeInTheDocument()
+    expect(screen.getByText('5 dishonour/overdrawn-item fee events')).toBeInTheDocument()
+    expect(screen.getByText('2200.00 / 5000.00 = 44.0000%')).toBeInTheDocument()
+    expect(screen.getByText(/external net cash flow negative in all three months/)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Adverse factors' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Positive factors' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /no offer or funds movement exists/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /offer|fund|retry|try again/i })).not.toBeInTheDocument()
   })
 })
 

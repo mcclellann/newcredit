@@ -1,0 +1,6 @@
+{
+  "accounts": [{
+    "account_id": "ACCT-SYN-H1", "customer_id": "CUST-SYN-008", "account_type": "transaction", "ownership": "sole", "applicant_share": "1.00",
+    "bsb_masked": "•••-908", "account_masked": "••••8047", "currency": "AUD", "coverage_start": "2026-07-01", "coverage_end": "2026-09-30", "active": true
+  }]
+}

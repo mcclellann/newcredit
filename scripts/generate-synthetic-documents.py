@@ -360,7 +360,7 @@ def generate_scenario(base: Path) -> None:
 
 
 def main() -> None:
-    for name in ("scenario-a", "scenario-b", "scenario-c"):
+    for name in ("scenario-a", "scenario-b", "scenario-c", "scenario-h"):
         generate_scenario(SCENARIOS / name)
     print("Generated synthetic documents and refreshed manifest hashes.")
 

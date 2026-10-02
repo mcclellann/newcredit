@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 import type { DemoApplication, DocumentSummary, Offer, Outcome } from '@newcredit/domain'
 import { aud } from '@newcredit/domain'
 
-export type ScenarioId = 'scenario-a' | 'scenario-b' | 'scenario-c'
+export type ScenarioId = 'scenario-a' | 'scenario-b' | 'scenario-c' | 'scenario-h'
 export type ScenarioFixture = {
   application: Omit<DemoApplication, 'id' | 'status' | 'version'>
   outcome: Omit<Outcome, 'applicationId'> | null
@@ -32,6 +32,7 @@ export async function loadScenario(scenarioId: ScenarioId): Promise<ScenarioFixt
   const documents: DocumentSummary[] = manifest.documents.map((d: any) => ({ id: d.document_id, type: d.document_type, issuer: d.stated_issuer, periodStart: d.period_start, periodEnd: d.period_end, status: d.processing_status }))
   const offer = events.offer
   const withheld = scenarioId === 'scenario-c'
+  const affordabilityResult = affordability.offered_rate ?? affordability.assessment_rate
   return {
     application: {
       scenarioId, fixedDemonstrationDate: manifest.fixed_demonstration_date,
@@ -45,9 +46,9 @@ export async function loadScenario(scenarioId: ScenarioId): Promise<ScenarioFixt
       documents: withheld ? [] : documents,
       accounts: accountsFile.accounts.map((a: any) => ({ id: a.account_id, type: a.account_type, ownership: a.ownership, applicantShare: Number(a.applicant_share), bsbMasked: a.bsb_masked, accountMasked: a.account_masked, active: a.active })),
       financialPosition: { assetsTotal: aud(sum('asset', 'amount')), liabilitiesTotal: aud(sum('liability', 'outstanding_balance')), monthlyDebtRepayments: aud(sum('liability', 'normalized_monthly')) },
-      review: withheld ? null : { monthlyNetIncome: aud(affordability.offered_rate.verified_net_income), assessedLivingExpenses: aud(affordability.offered_rate.assessed_general_living_expenses), monthlyHousing: aud(affordability.offered_rate.housing), classifiedTransactionCount: rows.length, documentChecksPassed: documents.length, transactionCategories: [...counts].map(([category, count]) => ({ category, count })).sort((a, b) => a.category.localeCompare(b.category)) },
+      review: withheld ? null : { monthlyNetIncome: aud(affordabilityResult.verified_net_income), assessedLivingExpenses: aud(affordabilityResult.assessed_general_living_expenses), monthlyHousing: aud(affordabilityResult.housing), classifiedTransactionCount: rows.length, documentChecksPassed: documents.length, transactionCategories: [...counts].map(([category, count]) => ({ category, count })).sort((a, b) => a.category.localeCompare(b.category)) },
     },
-    outcome: withheld ? null : { decision: risk.outcome, riskScore: risk.score, riskBand: risk.band, affordability: risk.affordability, monthlySurplus: aud(affordability.offered_rate.post_loan_surplus), reasons: risk.reason_codes, factors: (risk.factors ?? []).map((f: any) => ({ factor: f.factor, signal: f.raw, riskValue: f.risk_value })), illustrativeNotOffer: true },
+    outcome: withheld ? null : { decision: risk.outcome, riskScore: risk.score, riskBand: risk.band, affordability: risk.affordability, monthlySurplus: aud(affordabilityResult.post_loan_surplus), reasons: risk.reason_codes, factors: (risk.factors ?? []).map((f: any) => ({ factor: f.factor, signal: f.raw, riskValue: f.risk_value })), illustrativeNotOffer: true },
     offer: offer ? { id: offer.offer_id, principal: aud(offer.principal), termYears: offer.term_years, annualRateBasisPoints: Math.round(Number(offer.nominal_annual_rate) * 10_000), monthlyFee: aud(offer.monthly_fee), monthlyRepayment: aud(offer.scheduled_monthly_obligation), totalRepayable: aud(offer.total_repayable), destinationAccountMasked: events.disbursements[0].destination_account_masked, simulationNotice: offer.simulation_notice } : null,
   }
 }
@@ -55,6 +56,7 @@ export async function loadScenario(scenarioId: ScenarioId): Promise<ScenarioFixt
 export const loadScenarioA = () => loadScenario('scenario-a')
 export const loadScenarioB = () => loadScenario('scenario-b')
 export const loadScenarioC = () => loadScenario('scenario-c')
+export const loadScenarioH = () => loadScenario('scenario-h')
 
 export async function loadScenarioCDocumentData() {
   const root = fileURLToPath(new URL('../../../data/synthetic/scenarios/scenario-c/', import.meta.url))

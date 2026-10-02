@@ -1,0 +1,101 @@
+{
+  "fixed_demonstration_date": "2026-10-01",
+  "documents": [
+    {
+      "document_id": "DOC-SYN-H-LICENCE",
+      "document_type": "drivers_licence",
+      "file": "documents/drivers-licence.pdf",
+      "stated_issuer": "Freddie State Transport Authority (fictional)",
+      "period_start": null,
+      "period_end": "2029-03-17",
+      "page_count": 1,
+      "content_hash": "sha256:7f3a9de7c38c07af93c7dfe45af0b87fac5c106eeb4e31f506444d9325058be5",
+      "processing_status": "processed",
+      "synthetic_notice_visible": true
+    },
+    {
+      "document_id": "DOC-SYN-H-STMT-07",
+      "document_type": "bank_statement",
+      "file": "documents/bank-statement-2026-07.pdf",
+      "stated_issuer": "Nick's Bank (fictional)",
+      "period_start": "2026-07-01",
+      "period_end": "2026-07-31",
+      "page_count": 1,
+      "content_hash": "sha256:880c5840c5259a77caaa53b2ebe83965d7731b777c8df0091fc8297597cf672a",
+      "processing_status": "processed",
+      "synthetic_notice_visible": true
+    },
+    {
+      "document_id": "DOC-SYN-H-STMT-08",
+      "document_type": "bank_statement",
+      "file": "documents/bank-statement-2026-08.pdf",
+      "stated_issuer": "Nick's Bank (fictional)",
+      "period_start": "2026-08-01",
+      "period_end": "2026-08-31",
+      "page_count": 1,
+      "content_hash": "sha256:5e6a4533f4bf36e432e39b5a99c6b57cac5beb18ac2b67173672a3c82dcd905b",
+      "processing_status": "processed",
+      "synthetic_notice_visible": true
+    },
+    {
+      "document_id": "DOC-SYN-H-STMT-09",
+      "document_type": "bank_statement",
+      "file": "documents/bank-statement-2026-09.pdf",
+      "stated_issuer": "Nick's Bank (fictional)",
+      "period_start": "2026-09-01",
+      "period_end": "2026-09-30",
+      "page_count": 1,
+      "content_hash": "sha256:95d45b9a1ba91ee8cf1afbce46f22a3b330702a4774923372da391f67a375768",
+      "processing_status": "processed",
+      "synthetic_notice_visible": true
+    },
+    {
+      "document_id": "DOC-SYN-H-PAY-01",
+      "document_type": "payslip",
+      "file": "documents/payslip-2026-08-07.pdf",
+      "stated_issuer": "Qantas Airways Limited (unofficial synthetic fixture)",
+      "period_start": "2026-08-07",
+      "period_end": "2026-08-07",
+      "page_count": 1,
+      "content_hash": "sha256:7caca9c98bcdb94d0ba893ca3c78d3242e950ebbdde3b198ff280a4b9ca52cae",
+      "processing_status": "processed",
+      "synthetic_notice_visible": true
+    },
+    {
+      "document_id": "DOC-SYN-H-PAY-02",
+      "document_type": "payslip",
+      "file": "documents/payslip-2026-08-21.pdf",
+      "stated_issuer": "Qantas Airways Limited (unofficial synthetic fixture)",
+      "period_start": "2026-08-21",
+      "period_end": "2026-08-21",
+      "page_count": 1,
+      "content_hash": "sha256:b02d466f40da5f424061d68f5a2c3e4d1c57e0122017b2d845d9edaf19be9b82",
+      "processing_status": "processed",
+      "synthetic_notice_visible": true
+    },
+    {
+      "document_id": "DOC-SYN-H-PAY-03",
+      "document_type": "payslip",
+      "file": "documents/payslip-2026-09-04.pdf",
+      "stated_issuer": "Qantas Airways Limited (unofficial synthetic fixture)",
+      "period_start": "2026-09-04",
+      "period_end": "2026-09-04",
+      "page_count": 1,
+      "content_hash": "sha256:861dcf14ee505f7b23deed7bc9229544346e2376b10dabed369c4df34364e6fa",
+      "processing_status": "processed",
+      "synthetic_notice_visible": true
+    },
+    {
+      "document_id": "DOC-SYN-H-PAY-04",
+      "document_type": "payslip",
+      "file": "documents/payslip-2026-09-18.pdf",
+      "stated_issuer": "Qantas Airways Limited (unofficial synthetic fixture)",
+      "period_start": "2026-09-18",
+      "period_end": "2026-09-18",
+      "page_count": 1,
+      "content_hash": "sha256:e37bb95591b99e3d667e76f7f38f86081f2fae1461dd72560c07b810fb3f8485",
+      "processing_status": "processed",
+      "synthetic_notice_visible": true
+    }
+  ]
+}

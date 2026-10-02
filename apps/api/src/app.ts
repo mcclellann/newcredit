@@ -13,7 +13,7 @@ import { loadScenario, loadScenarioCDocumentData, type ScenarioId } from '@newcr
 import { createDatabase, migrateDatabase, type ApiDatabase } from './db.js'
 
 const Id = Type.Object({ id: Type.String({ minLength: 1 }) })
-const ScenarioIdSchema = Type.Union([Type.Literal('scenario-a'), Type.Literal('scenario-b'), Type.Literal('scenario-c')])
+const ScenarioIdSchema = Type.Union([Type.Literal('scenario-a'), Type.Literal('scenario-b'), Type.Literal('scenario-c'), Type.Literal('scenario-h')])
 const ScenarioBody = Type.Object({ scenarioId: ScenarioIdSchema }, { additionalProperties: false })
 const ConfirmationBody = Type.Object({ confirmation: Type.Literal(true) }, { additionalProperties: false })
 const IdempotencyHeaders = Type.Object({ 'idempotency-key': Type.String({ minLength: 1, maxLength: 255 }) })
@@ -25,7 +25,7 @@ const DocumentSchema = Type.Object({
 })
 const ApplicationSchema = Type.Object({
   id: Type.String(), scenarioId: ScenarioIdSchema,
-  status: Type.Union([Type.Literal('documents_required'), Type.Literal('processing'), Type.Literal('needs_review'), Type.Literal('ready_to_submit'), Type.Literal('submitted'), Type.Literal('referred'), Type.Literal('offer_accepted'), Type.Literal('funded')]),
+  status: Type.Union([Type.Literal('documents_required'), Type.Literal('processing'), Type.Literal('needs_review'), Type.Literal('ready_to_submit'), Type.Literal('submitted'), Type.Literal('referred'), Type.Literal('not_approved'), Type.Literal('offer_accepted'), Type.Literal('funded')]),
   version: Type.Integer(), fixedDemonstrationDate: Type.String(),
   customer: Type.Object({ type: Type.Union([Type.Literal('new'), Type.Literal('existing')]), name: Type.String(), dateOfBirth: Type.String(), email: Type.String(), phone: Type.String(), address: Type.String(), employer: Type.String(), existingCustomerReference: Type.Optional(Type.String()), profileConfirmation: Type.Optional(Type.Object({ confirmed: Type.Boolean(), at: Type.String(), fields: Type.Array(Type.String()) })) }),
   loan: Type.Object({ amount: MoneySchema, termYears: Type.Integer(), purpose: Type.String(), purposeDetail: Type.String() }),
@@ -35,8 +35,8 @@ const ApplicationSchema = Type.Object({
   review: Type.Union([Type.Object({ monthlyNetIncome: MoneySchema, assessedLivingExpenses: MoneySchema, monthlyHousing: MoneySchema, classifiedTransactionCount: Type.Integer(), documentChecksPassed: Type.Integer(), transactionCategories: Type.Array(Type.Object({ category: Type.String(), count: Type.Integer() })) }), Type.Null()]),
 })
 const OutcomeSchema = Type.Object({
-  applicationId: Type.String(), decision: Type.Union([Type.Literal('indicatively_approved'), Type.Literal('referred')]), riskScore: Type.Integer(), riskBand: Type.Union([Type.Literal('very_low'), Type.Literal('moderate')]),
-  affordability: Type.Literal('affordable'), monthlySurplus: MoneySchema, reasons: Type.Array(Type.String()), factors: Type.Array(Type.Object({ factor: Type.String(), signal: Type.String(), riskValue: Type.Integer() })), illustrativeNotOffer: Type.Literal(true),
+  applicationId: Type.String(), decision: Type.Union([Type.Literal('indicatively_approved'), Type.Literal('referred'), Type.Literal('not_approved')]), riskScore: Type.Integer(), riskBand: Type.Union([Type.Literal('very_low'), Type.Literal('moderate'), Type.Literal('high')]),
+  affordability: Type.Union([Type.Literal('affordable'), Type.Literal('unaffordable')]), monthlySurplus: MoneySchema, reasons: Type.Array(Type.String()), factors: Type.Array(Type.Object({ factor: Type.String(), signal: Type.String(), riskValue: Type.Integer() })), illustrativeNotOffer: Type.Literal(true),
 })
 const OfferSchema = Type.Object({
   id: Type.String(), applicationId: Type.String(), principal: MoneySchema, termYears: Type.Integer(), annualRateBasisPoints: Type.Integer(),
@@ -96,7 +96,7 @@ export async function buildApp(options: BuildAppOptions = {}) {
   app.get('/openapi.json', { schema: { hide: true } }, async () => app.swagger())
 
   app.get('/api/v1/demo-scenarios', { schema: { tags: ['demo'], response: { 200: Type.Object({ scenarios: Type.Array(Type.Object({ id: ScenarioIdSchema, name: Type.String(), description: Type.String() })) }) } } }, async () => ({
-    scenarios: [{ id: 'scenario-a' as const, name: 'Scenario A', description: 'Indicative approval and simulated funding' }, { id: 'scenario-b' as const, name: 'Scenario B', description: 'Existing customer referral' }, { id: 'scenario-c' as const, name: 'Scenario C', description: 'Document review required' }],
+    scenarios: [{ id: 'scenario-a' as const, name: 'Scenario A', description: 'Indicative approval and simulated funding' }, { id: 'scenario-b' as const, name: 'Scenario B', description: 'Existing customer referral' }, { id: 'scenario-c' as const, name: 'Scenario C', description: 'Document review required' }, { id: 'scenario-h' as const, name: 'Scenario H', description: 'Unaffordable high-risk application not approved' }],
   }))
 
   app.post('/api/v1/demo-sessions', { schema: { tags: ['demo'], response: { 201: Type.Object({ id: Type.String(), createdAt: Type.String() }) } } }, async (_request, reply) => {
@@ -105,7 +105,11 @@ export async function buildApp(options: BuildAppOptions = {}) {
     return reply.code(201).send(session)
   })
 
-  app.post('/api/v1/demo-sessions/login', { schema: { tags: ['demo'], body: Type.Object({ scenarioId: Type.Literal('scenario-b') }), response: { 200: Type.Object({ scenarioId: Type.Literal('scenario-b'), customerReference: Type.String(), customerName: Type.String(), simulated: Type.Literal(true), notice: Type.String() }) } } }, async () => ({ scenarioId: 'scenario-b' as const, customerReference: 'EXIST-SYN-B-204', customerName: 'Morgan Sample', simulated: true as const, notice: 'Demonstration login only; this is not production authentication.' }))
+  app.post('/api/v1/demo-sessions/login', { schema: { tags: ['demo'], body: Type.Object({ scenarioId: Type.Union([Type.Literal('scenario-b'), Type.Literal('scenario-h')]) }), response: { 200: Type.Object({ scenarioId: Type.Union([Type.Literal('scenario-b'), Type.Literal('scenario-h')]), customerReference: Type.String(), customerName: Type.String(), simulated: Type.Literal(true), notice: Type.String() }) } } }, async (request) => {
+    const scenarioId = (request.body as { scenarioId: 'scenario-b' | 'scenario-h' }).scenarioId
+    const fixture = await loadScenario(scenarioId)
+    return { scenarioId, customerReference: fixture.application.customer.existingCustomerReference!, customerName: fixture.application.customer.name, simulated: true as const, notice: 'Demonstration login only; this is not production authentication.' }
+  })
 
   app.post('/api/v1/applications', { schema: { tags: ['applications'], body: ScenarioBody, response: { 201: ApplicationSchema } } }, async (request, reply) => {
     const scenarioId = (request.body as { scenarioId: ScenarioId }).scenarioId
@@ -293,7 +297,7 @@ export async function buildApp(options: BuildAppOptions = {}) {
       if (status === 'needs_review' || status === 'documents_required' || status === 'processing') throw new HttpProblem(409, 'Review Required — Outcome Withheld', `Application is ${status}; submission, assessment, and outcome are withheld until both document blockers are resolved`)
       if (status !== 'ready_to_submit') throw new HttpProblem(409, 'Invalid Application State', `Application is ${status}`)
       const scenarioId = row.scenario_id as ScenarioId
-      const targetStatus = scenarioId === 'scenario-b' ? 'referred' as const : 'submitted' as const
+      const targetStatus: ApplicationStatus = scenarioId === 'scenario-b' ? 'referred' : scenarioId === 'scenario-h' ? 'not_approved' : 'submitted'
       assertTransition(status, targetStatus)
       const application = { ...parse<DemoApplication>(row.snapshot as string), status: targetStatus, version: (row.version as number) + 1 }
       db.prepare('UPDATE applications SET status = ?, version = ?, snapshot = ?, updated_at = ? WHERE id = ?')
@@ -321,6 +325,7 @@ export async function buildApp(options: BuildAppOptions = {}) {
     const application = getApplicationRow(id)
     if (application.scenario_id === 'scenario-c') throw new HttpProblem(409, 'Offer Withheld — Review Required', 'No offer, acceptance, or funding is possible while document review blockers remain')
     if (application.status === 'referred') throw new HttpProblem(409, 'Application Referred', 'This application was referred and no offer was created')
+    if (application.status === 'not_approved') throw new HttpProblem(409, 'Application Not Approved', 'This application was not approved and no offer, acceptance, or funding is available')
     const row = db.prepare('SELECT snapshot FROM offers WHERE application_id = ?').get(id) as { snapshot: string } | undefined
     if (!row) throw new HttpProblem(409, 'Offer Not Available', 'Submit the application first')
     return parse<Offer>(row.snapshot)

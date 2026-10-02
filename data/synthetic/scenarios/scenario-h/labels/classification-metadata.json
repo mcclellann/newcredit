@@ -1,0 +1,7 @@
+{
+  "taxonomy_version": "approved-initial-v1",
+  "authorship": "Labels were independently authored from future implementation.",
+  "allowed_categories": ["expense.debt_repayment", "expense.dishonour_fee", "expense.groceries", "expense.housing", "expense.other", "expense.transport", "expense.utilities", "income.salary"],
+  "joint_account_policy": "Not applicable; the only active account is solely owned and every row is retained.",
+  "risk_relevant_second_review": "pending_owner_review", "review_status": "pending_owner_review"
+}

@@ -1,0 +1,8 @@
+{
+  "method": "independently total normalized labelled rows; internal transfers excluded from external cash flow",
+  "summaries": [
+    { "month": "2026-07", "account_id": "ACCT-SYN-H1", "opening_balance": "1600.00", "credits": "5000.00", "debits": "5580.00", "closing_balance": "1020.00", "net_cash_flow": "-580.00", "internal_transfers_excluded": "0.00", "applicant_share": "1.00" },
+    { "month": "2026-08", "account_id": "ACCT-SYN-H1", "opening_balance": "1020.00", "credits": "5000.00", "debits": "5725.00", "closing_balance": "295.00", "net_cash_flow": "-725.00", "internal_transfers_excluded": "0.00", "applicant_share": "1.00" },
+    { "month": "2026-09", "account_id": "ACCT-SYN-H1", "opening_balance": "295.00", "credits": "5000.00", "debits": "5795.00", "closing_balance": "-500.00", "net_cash_flow": "-795.00", "internal_transfers_excluded": "0.00", "applicant_share": "1.00" }
+  ]
+}

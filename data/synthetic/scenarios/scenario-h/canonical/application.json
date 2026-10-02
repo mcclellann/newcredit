@@ -1,0 +1,6 @@
+{
+  "application_id": "APP-SYN-H", "customer_id": "CUST-SYN-008", "status": "submitted",
+  "requested_amount": "15000.00", "requested_term_years": 5, "loan_purpose": "essential_home_repairs", "purpose_detail": "Synthetic urgent wet-season roof repairs",
+  "assessment_rate": "0.19", "offered_rate": null, "monthly_fee": "15.00", "serviceability_buffer": "0.20",
+  "applicant_confirmation": { "confirmed": true, "at": "2026-10-01T09:20:00+09:30" }, "synthetic_demo_consent": true
+}

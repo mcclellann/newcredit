@@ -1,0 +1,7 @@
+{
+  "employment_id": "EMP-SYN-H", "application_id": "APP-SYN-H", "employer": "Qantas Airways Limited",
+  "employment_status": "permanent_full_time", "pay_frequency": "fortnightly", "gross_pay": "3300.00", "net_pay": "2500.00",
+  "observed_net_pay_august": "5000.00", "observed_net_pay_september": "5000.00", "verified_net_income_monthly": "5000.00",
+  "continuing_confirmed": true, "income_variation_method": "(maximum fortnightly pay - minimum fortnightly pay) / mean fortnightly pay across required payslips",
+  "income_variation": "0.000000", "source": "payslips_and_transactions", "verification_status": "verified"
+}

@@ -18,12 +18,29 @@ describe('Scenario B API', () => {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`).run('app-a', 'scenario-a', 'submitted', 2, '{}', '{}', '2026-10-01', '2026-10-01')
     sqlite.prepare('INSERT INTO offers (id, application_id, status, snapshot) VALUES (?, ?, ?, ?)')
       .run('offer-a', 'app-a', 'ready', '{}')
+    sqlite.pragma('foreign_keys = OFF')
+    sqlite.exec(`${readFileSync(new URL('../drizzle/0001_scenario_b.sql', import.meta.url), 'utf8')}
+      ${readFileSync(new URL('../drizzle/0002_scenario_c_documents.sql', import.meta.url), 'utf8')}
+      PRAGMA user_version = 3;`)
+    sqlite.pragma('foreign_keys = ON')
+    sqlite.prepare('INSERT INTO disbursements VALUES (?, ?, ?, ?, ?)').run('fund-a', 'offer-a', 'completed', '{}', '2026-10-01')
+    sqlite.prepare('INSERT INTO application_corrections VALUES (?, ?, ?, ?, ?, ?, ?)').run('correction-a', 'app-a', 'loan.purposeDetail', 'old', 'new', 2, '2026-10-01')
+    sqlite.prepare('INSERT INTO documents VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').run('document-a', 'app-a', 'sha256:test', 'application/pdf', 'test.pdf', 'test.pdf', 'payslip', 'issuer', null, null, 'processed', '2026-10-01', '2026-10-01')
+    sqlite.prepare('INSERT INTO document_checks (application_id, document_id, check_name, status, details, data) VALUES (?, ?, ?, ?, ?, ?)').run('app-a', 'document-a', 'test', 'passed', 'ok', '{}')
+    sqlite.prepare('INSERT INTO extracted_fields VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').run('field-a', 'app-a', 'document-a', 'income', '1', '1', '1.0', '{}', 0)
+    sqlite.prepare('INSERT INTO application_audit_events VALUES (?, ?, ?, ?, ?, ?)').run('audit-a', 'app-a', 1, 'created', '2026-10-01', '{}')
+    sqlite.prepare('INSERT INTO idempotency_records VALUES (?, ?, ?, ?, ?, ?)').run('submission', 'key-a', 'app-a', 200, '{}', '2026-10-01')
 
     migrateDatabase(sqlite)
 
-    expect(sqlite.pragma('user_version', { simple: true })).toBe(3)
+    expect(sqlite.pragma('user_version', { simple: true })).toBe(4)
     expect(sqlite.prepare('SELECT scenario_id FROM applications WHERE id = ?').get('app-a')).toEqual({ scenario_id: 'scenario-a' })
     expect(sqlite.prepare('SELECT application_id FROM offers WHERE id = ?').get('offer-a')).toEqual({ application_id: 'app-a' })
+    for (const [table, id] of [['disbursements', 'fund-a'], ['application_corrections', 'correction-a'], ['documents', 'document-a'], ['extracted_fields', 'field-a'], ['application_audit_events', 'audit-a']] as const) {
+      expect(sqlite.prepare(`SELECT id FROM ${table} WHERE id = ?`).get(id)).toEqual({ id })
+    }
+    expect(sqlite.prepare('SELECT id FROM document_checks').get()).toEqual({ id: 1 })
+    expect(sqlite.prepare('SELECT resource_id FROM idempotency_records WHERE idempotency_key = ?').get('key-a')).toEqual({ resource_id: 'app-a' })
     expect(sqlite.pragma('foreign_key_check')).toEqual([])
     sqlite.close()
   })

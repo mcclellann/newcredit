@@ -25,8 +25,8 @@ const key = () => crypto.randomUUID()
 export const api = {
   scenarios: () => request<unknown>('/demo-scenarios'),
   createSession: () => request<unknown>('/demo-sessions', { method: 'POST', body: JSON.stringify({ scenarioId: 'scenario-a' }) }),
-  login: () => request<DemoLogin>('/demo-sessions/login', { method: 'POST', body: JSON.stringify({ scenarioId: 'scenario-b' }) }),
-  createApplication: (scenarioId: 'scenario-a' | 'scenario-b' | 'scenario-c' = 'scenario-a') => request<Application>('/applications', { method: 'POST', body: JSON.stringify({ scenarioId }) }),
+  login: (scenarioId: 'scenario-b' | 'scenario-h' = 'scenario-b') => request<DemoLogin>('/demo-sessions/login', { method: 'POST', body: JSON.stringify({ scenarioId }) }),
+  createApplication: (scenarioId: 'scenario-a' | 'scenario-b' | 'scenario-c' | 'scenario-h' = 'scenario-a') => request<Application>('/applications', { method: 'POST', body: JSON.stringify({ scenarioId }) }),
   application: (id: string) => request<Application>(`/applications/${id}`),
   documents: (id: string) => request<{ documents: StoredDocument[] }>(`/applications/${id}/documents`),
   stageDemoDocuments: (id: string) => request<{ documents: StoredDocument[] }>(`/applications/${id}/documents/stage-demo`, { method: 'POST' }),
@@ -46,5 +46,5 @@ export const api = {
   disburse: (id: string) => request<Disbursement>(`/offers/${id}/disbursement`, { method: 'POST', headers: { 'Idempotency-Key': key() }, body: JSON.stringify({ confirmation: true }) }),
 }
 
-export const aud = ({ amountMinor }: MoneyLike) => new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(amountMinor / 100)
+export const aud = ({ amountMinor }: MoneyLike) => new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(amountMinor / 100).replace(/^-/, '−')
 type MoneyLike = { amountMinor: number }
