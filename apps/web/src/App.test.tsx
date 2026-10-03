@@ -106,25 +106,56 @@ describe('Document review journey', () => {
   const application = { id: 'app-c', scenarioId: 'scenario-c', status: 'documents_required', version: 1, fixedDemonstrationDate: '2026-10-01', customer: { type: 'new', name: 'Casey Fiction' }, documents: [], review: null }
   const documents = Array.from({ length: 7 }, (_, index) => ({ id: `doc-${index}`, applicationId: 'app-c', sourceHash: `${index}`, mediaType: 'application/pdf', originalName: `${index}.pdf`, type: index < 2 ? 'bank_statement' : index === 2 ? 'drivers_licence' : 'payslip', issuer: 'Synthetic issuer', periodStart: '2026-08-01', periodEnd: '2026-08-31', status: 'uploaded', createdAt: '', updatedAt: '' }))
 
-  it('offers the choice and shows intake requirements and seven staged documents', async () => {
+  it('enforces counts and unlocks document stages sequentially', async () => {
+    const counts = { drivers_licence: { uploaded: 0, processed: 0 }, payslip: { uploaded: 0, processed: 0 } }
+    let applicationStatus = 'documents_required'
+    const uploadRequests: RequestInit[] = []
     vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
       const url = String(input)
       if (url.endsWith('/demo-scenarios')) return new Response(JSON.stringify({ scenarios: [] }), { status: 200 })
-      if (url.endsWith('/applications/app-c')) return new Response(JSON.stringify(application), { status: 200 })
-      if (url.endsWith('/applications/app-c/documents/stage-demo')) {
-        expect(new Headers(init?.headers).has('Content-Type')).toBe(false)
-        return new Response(JSON.stringify({ documents }), { status: 200 })
+      if (url.endsWith('/applications/app-c')) return new Response(JSON.stringify({ ...application, status: applicationStatus, documents: [] }), { status: 200 })
+      if (url.endsWith('/document-review')) return new Response(JSON.stringify({ status: 'partial', checks: [], blockers: [], extractedFields: [], auditEvents: [] }), { status: 200 })
+      if (url.endsWith('/document-requirements')) return new Response(JSON.stringify({ expectedCount: 2, uploadedCount: counts.drivers_licence.uploaded + counts.payslip.uploaded, remainingCount: 2 - counts.drivers_licence.uploaded - counts.payslip.uploaded, requirements: [{ type: 'drivers_licence', count: 1, text: 'Identity', uploadedCount: counts.drivers_licence.uploaded, processedCount: counts.drivers_licence.processed }, { type: 'payslip', count: 1, text: 'Income', uploadedCount: counts.payslip.uploaded, processedCount: counts.payslip.processed }], expectedDocuments: [{ filename: 'licence.pdf', type: 'drivers_licence' }, { filename: 'pay.pdf', type: 'payslip' }] }), { status: 200 })
+      if (url.includes('/applications/app-c/documents?documentType=') && init?.method === 'POST') {
+        uploadRequests.push(init)
+        const file = (init.body as FormData).get('file') as File
+        const type = file.name.includes('licence') ? 'drivers_licence' : 'payslip'
+        expect(new URL(url, 'https://example.test').searchParams.get('documentType')).toBe(type)
+        counts[type].uploaded += 1
+        return new Response(JSON.stringify({ ...documents[0], id: file.name, originalName: file.name, type }), { status: 201 })
       }
-      return new Response(JSON.stringify({ documents: [] }), { status: 200 })
+      if (url.includes('/document-processing?')) {
+        const type = new URL(url, 'https://example.test').searchParams.get('documentType') as keyof typeof counts
+        counts[type].processed = counts[type].uploaded
+        applicationStatus = type === 'payslip' ? 'needs_review' : 'documents_required'
+        return new Response(JSON.stringify({ ...application, status: applicationStatus }), { status: 200 })
+      }
+      if (url.endsWith('/applications/app-c/documents')) return new Response(JSON.stringify({ documents: [] }), { status: 200 })
+      return new Response('{}', { status: 200 })
     })
     renderAt('/')
     await waitFor(() => expect(screen.getByRole('button', { name: /document review example/i })).toBeEnabled())
     cleanup(); renderAt('/applications/app-c/documents')
     expect(await screen.findByRole('heading', { name: /Casey Fiction’s documents/i })).toBeInTheDocument()
-    expect(screen.getByText(/three months of statements/i)).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: /use prepared synthetic document pack/i }))
-    expect(await screen.findByText('7 of 7 documents uploaded')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /process documents/i })).toBeEnabled()
+    expect(screen.getByRole('link', { name: /download synthetic test pack/i })).toHaveAttribute('href', '/api/v1/applications/app-c/documents/demo-pack')
+    expect(screen.getByRole('heading', { name: /let’s get to know you/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /let’s see how you’re paid/i }).closest('section')).toHaveClass('locked')
+    const identityAction = screen.getByRole('button', { name: /upload and process identity/i })
+    fireEvent.change(screen.getByLabelText(/choose 1 freddie state driver licence/i), { target: { files: [new File(['wrong'], 'wrong.pdf'), new File(['extra'], 'extra.pdf')] } })
+    expect(identityAction).toBeDisabled()
+    fireEvent.change(screen.getByLabelText(/choose 1 freddie state driver licence/i), { target: { files: [new File(['licence'], 'licence.pdf', { type: 'application/pdf' })] } })
+    fireEvent.click(identityAction)
+    await waitFor(() => expect(screen.getByRole('button', { name: /upload and process pay/i })).toBeInTheDocument())
+    fireEvent.change(screen.getByLabelText(/choose 1 payslip/i), { target: { files: [new File(['pay'], 'pay.pdf', { type: 'application/pdf' })] } })
+    const payAction = screen.getByRole('button', { name: /upload and process pay/i })
+    expect(payAction).toBeEnabled()
+    fireEvent.click(payAction)
+    await waitFor(() => expect(uploadRequests).toHaveLength(2))
+    uploadRequests.forEach(request => {
+      expect(request.body).toBeInstanceOf(FormData)
+      expect(new Headers(request.headers).has('Content-Type')).toBe(false)
+    })
+    expect(await screen.findByRole('button', { name: /continue to document blockers/i })).toBeInTheDocument()
   })
 
   it('shows exactly two blockers, licence provenance, and no outcome actions', async () => {

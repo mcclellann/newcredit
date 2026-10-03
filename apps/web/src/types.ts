@@ -3,6 +3,16 @@ export type DocumentType = 'bank_statement' | 'drivers_licence' | 'payslip'
 export type DocumentStatus = 'uploaded' | 'processing' | 'processed' | 'needs_review'
 export type Document = { id: string; type: DocumentType; issuer: string; periodStart: string | null; periodEnd: string | null; status: DocumentStatus }
 export type StoredDocument = Document & { applicationId: string; sourceHash: string; mediaType: string; originalName: string; createdAt: string; updatedAt: string }
+export type DocumentRequirement = { type: DocumentType; count: number; text: string; uploadedCount: number; processedCount: number; label?: string; description?: string }
+export type ExpectedDocument = { filename: string; type: DocumentType; issuer?: string; periodStart?: string | null; periodEnd?: string | null }
+export type DocumentRequirements = {
+  expectedCount: number
+  uploadedCount: number
+  remainingCount: number
+  requirements: DocumentRequirement[]
+  expectedDocuments?: ExpectedDocument[]
+  documents?: ExpectedDocument[]
+}
 export type Application = {
   id: string; scenarioId: 'scenario-a' | 'scenario-b' | 'scenario-c' | 'scenario-h'; status: 'documents_required' | 'processing' | 'needs_review' | 'ready_to_submit' | 'submitted' | 'referred' | 'not_approved' | 'offer_accepted' | 'funded'; version: number; fixedDemonstrationDate: string
   customer: { type: 'new' | 'existing'; name: string; dateOfBirth: string; email: string; phone: string; address: string; employer: string; existingCustomerReference?: string; profileConfirmation?: { confirmed: boolean; at: string; fields: string[] } }

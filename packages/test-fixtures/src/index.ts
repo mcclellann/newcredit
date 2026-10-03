@@ -58,8 +58,8 @@ export const loadScenarioB = () => loadScenario('scenario-b')
 export const loadScenarioC = () => loadScenario('scenario-c')
 export const loadScenarioH = () => loadScenario('scenario-h')
 
-export async function loadScenarioCDocumentData() {
-  const root = fileURLToPath(new URL('../../../data/synthetic/scenarios/scenario-c/', import.meta.url))
+export async function loadScenarioDocumentData(scenarioId: ScenarioId) {
+  const root = fileURLToPath(new URL(`../../../data/synthetic/scenarios/${scenarioId}/`, import.meta.url))
   const [manifest, checks, extractedFields] = await Promise.all([
     loadJson<any>(root, 'documents/manifest.json'), loadJson<any>(root, 'documents/check-results.json'),
     loadJson<any>(root, 'documents/extracted-fields.json'),
@@ -70,3 +70,6 @@ export async function loadScenarioCDocumentData() {
   })))
   return { manifest, documents, checks: checks.results, extractedFields: extractedFields.fields }
 }
+
+/** @deprecated Use loadScenarioDocumentData so intake remains scenario-scoped. */
+export const loadScenarioCDocumentData = () => loadScenarioDocumentData('scenario-c')

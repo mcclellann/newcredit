@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import type { FastifyInstance } from 'fastify'
 import { buildApp } from '../src/app.js'
+import { processPack } from './document-helpers.js'
 
 let app: FastifyInstance | undefined
 afterEach(async () => { await app?.close(); app = undefined })
@@ -10,9 +11,11 @@ describe('Scenario A API', () => {
     app = await buildApp({ databaseUrl: ':memory:', migrate: true })
     const created = await app.inject({ method: 'POST', url: '/api/v1/applications', payload: { scenarioId: 'scenario-a' } })
     expect(created.statusCode).toBe(201)
-    expect(created.json()).toMatchObject({ scenarioId: 'scenario-a', status: 'ready_to_submit', version: 1 })
+    expect(created.json()).toMatchObject({ scenarioId: 'scenario-a', status: 'documents_required', version: 1, documents: [], review: null })
     expect(Number.isInteger(created.json().loan.amount.amountMinor)).toBe(true)
     const applicationId = created.json().id as string
+    const processed = await processPack(app, applicationId, 'scenario-a')
+    expect(processed.json()).toMatchObject({ status: 'ready_to_submit', version: 4, review: { documentChecksPassed: 8 } })
 
     const missingKey = await app.inject({ method: 'POST', url: `/api/v1/applications/${applicationId}/submission`, payload: { confirmation: true } })
     expect(missingKey.statusCode).toBe(400)
@@ -22,7 +25,7 @@ describe('Scenario A API', () => {
       method: 'POST', url: `/api/v1/applications/${applicationId}/submission`,
       headers: { 'idempotency-key': 'submit-1' }, payload: { confirmation: true },
     })
-    expect(submitted.json()).toMatchObject({ status: 'submitted', version: 2 })
+    expect(submitted.json()).toMatchObject({ status: 'submitted', version: 5 })
     const offerResponse = await app.inject({ method: 'GET', url: `/api/v1/applications/${applicationId}/offer` })
     const offerId = offerResponse.json().id as string
 
@@ -47,7 +50,7 @@ describe('Scenario A API', () => {
     const fetched = await app.inject({ method: 'GET', url: `/api/v1/disbursements/${first.json().id}` })
     expect(fetched.json()).toEqual(first.json())
     const application = await app.inject({ method: 'GET', url: `/api/v1/applications/${applicationId}` })
-    expect(application.json()).toMatchObject({ status: 'funded', version: 4 })
+    expect(application.json()).toMatchObject({ status: 'funded', version: 7 })
   })
 
   it('publishes all explicit routes in OpenAPI', async () => {

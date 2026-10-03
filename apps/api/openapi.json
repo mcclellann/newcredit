@@ -1511,7 +1511,7 @@
             },
             "in": "query",
             "name": "documentType",
-            "required": true
+            "required": false
           },
           {
             "schema": {
@@ -1679,10 +1679,9 @@
         }
       }
     },
-    "/api/v1/applications/{id}/documents/stage-demo": {
-      "post": {
+    "/api/v1/applications/{id}/document-requirements": {
+      "get": {
         "tags": [
-          "demo",
           "documents"
         ],
         "parameters": [
@@ -1704,76 +1703,65 @@
                 "schema": {
                   "type": "object",
                   "required": [
-                    "documents"
+                    "expectedCount",
+                    "uploadedCount",
+                    "remainingCount",
+                    "requirements",
+                    "expectedDocuments"
                   ],
                   "properties": {
-                    "documents": {
+                    "expectedCount": {
+                      "type": "integer"
+                    },
+                    "uploadedCount": {
+                      "type": "integer"
+                    },
+                    "remainingCount": {
+                      "type": "integer"
+                    },
+                    "requirements": {
                       "type": "array",
                       "items": {
                         "type": "object",
                         "required": [
-                          "id",
-                          "applicationId",
-                          "sourceHash",
-                          "mediaType",
-                          "originalName",
                           "type",
-                          "issuer",
-                          "periodStart",
-                          "periodEnd",
-                          "status",
-                          "createdAt",
-                          "updatedAt"
+                          "count",
+                          "text",
+                          "uploadedCount",
+                          "processedCount"
                         ],
                         "properties": {
-                          "id": {
-                            "type": "string"
-                          },
-                          "applicationId": {
-                            "type": "string"
-                          },
-                          "sourceHash": {
-                            "type": "string"
-                          },
-                          "mediaType": {
-                            "type": "string"
-                          },
-                          "originalName": {
-                            "type": "string"
-                          },
                           "type": {
                             "type": "string"
                           },
-                          "issuer": {
+                          "count": {
+                            "type": "integer"
+                          },
+                          "text": {
                             "type": "string"
                           },
-                          "periodStart": {
-                            "anyOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ]
+                          "uploadedCount": {
+                            "type": "integer"
                           },
-                          "periodEnd": {
-                            "anyOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ]
-                          },
-                          "status": {
+                          "processedCount": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    },
+                    "expectedDocuments": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "filename",
+                          "type"
+                        ],
+                        "properties": {
+                          "filename": {
                             "type": "string"
                           },
-                          "createdAt": {
-                            "type": "string"
-                          },
-                          "updatedAt": {
+                          "type": {
                             "type": "string"
                           }
                         }
@@ -1787,12 +1775,71 @@
         }
       }
     },
+    "/api/v1/applications/{id}/documents/demo-pack": {
+      "get": {
+        "tags": [
+          "demo",
+          "documents"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/zip": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/applications/{id}/document-processing": {
       "post": {
         "tags": [
           "documents"
         ],
         "parameters": [
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "bank_statement"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "drivers_licence"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "payslip"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "documentType",
+            "required": true
+          },
           {
             "schema": {
               "minLength": 1,

@@ -1,4 +1,4 @@
-import type { Application, Correction, DemoLogin, Disbursement, DocumentReview, DocumentType, Offer, Outcome, StoredDocument } from './types'
+import type { Application, Correction, DemoLogin, Disbursement, DocumentRequirements, DocumentReview, DocumentType, Offer, Outcome, StoredDocument } from './types'
 
 const base = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
 
@@ -28,15 +28,16 @@ export const api = {
   login: (scenarioId: 'scenario-b' | 'scenario-h' = 'scenario-b') => request<DemoLogin>('/demo-sessions/login', { method: 'POST', body: JSON.stringify({ scenarioId }) }),
   createApplication: (scenarioId: 'scenario-a' | 'scenario-b' | 'scenario-c' | 'scenario-h' = 'scenario-a') => request<Application>('/applications', { method: 'POST', body: JSON.stringify({ scenarioId }) }),
   application: (id: string) => request<Application>(`/applications/${id}`),
+  documentRequirements: (id: string) => request<DocumentRequirements>(`/applications/${id}/document-requirements`),
+  documentPackUrl: (id: string) => `${base}/api/v1/applications/${id}/documents/demo-pack`,
   documents: (id: string) => request<{ documents: StoredDocument[] }>(`/applications/${id}/documents`),
-  stageDemoDocuments: (id: string) => request<{ documents: StoredDocument[] }>(`/applications/${id}/documents/stage-demo`, { method: 'POST' }),
   uploadDocument: async (id: string, documentType: DocumentType, file: File) => {
     const body = new FormData(); body.append('file', file)
-    const response = await fetch(`${base}/api/v1/applications/${id}/documents?documentType=${documentType}`, { method: 'POST', body })
+    const response = await fetch(`${base}/api/v1/applications/${id}/documents?documentType=${encodeURIComponent(documentType)}`, { method: 'POST', body })
     if (!response.ok) { let message = 'The document could not be uploaded.'; try { message = (await response.json() as { detail?: string }).detail || message } catch { /* safe fallback */ }; throw new ApiError(message, response.status) }
     return response.json() as Promise<StoredDocument>
   },
-  processDocuments: (id: string) => request<Application>(`/applications/${id}/document-processing`, { method: 'POST' }),
+  processDocuments: (id: string, documentType: DocumentType) => request<Application>(`/applications/${id}/document-processing?documentType=${encodeURIComponent(documentType)}`, { method: 'POST' }),
   documentReview: (id: string) => request<DocumentReview>(`/applications/${id}/document-review`),
   correctPurpose: (id: string, purposeDetail: string) => request<Correction>(`/applications/${id}/corrections`, { method: 'POST', body: JSON.stringify({ purposeDetail }) }),
   submit: (id: string) => request<Application>(`/applications/${id}/submission`, { method: 'POST', headers: { 'Idempotency-Key': key() }, body: JSON.stringify({ confirmation: true }) }),

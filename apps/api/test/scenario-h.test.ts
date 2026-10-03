@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import type { FastifyInstance } from 'fastify'
 import { buildApp } from '../src/app.js'
+import { processPack } from './document-helpers.js'
 
 let app: FastifyInstance | undefined
 afterEach(async () => { await app?.close(); app = undefined })
@@ -14,13 +15,15 @@ describe('Scenario H API', () => {
     const created = await app.inject({ method: 'POST', url: '/api/v1/applications', payload: { scenarioId: 'scenario-h' } })
     expect(created.statusCode).toBe(201)
     expect(created.json()).toMatchObject({
-      scenarioId: 'scenario-h', status: 'ready_to_submit', version: 1,
+      scenarioId: 'scenario-h', status: 'documents_required', version: 1,
       financialPosition: { assetsTotal: { amountMinor: 0 }, liabilitiesTotal: { amountMinor: 3328419 }, monthlyDebtRepayments: { amountMinor: 220000 } },
-      review: { documentChecksPassed: 8, classifiedTransactionCount: 29 },
+      documents: [], review: null,
     })
     const id = created.json().id as string
+    const processed = await processPack(app, id, 'scenario-h')
+    expect(processed.json()).toMatchObject({ status: 'ready_to_submit', review: { documentChecksPassed: 8, classifiedTransactionCount: 29 } })
     const first = await app.inject({ method: 'POST', url: `/api/v1/applications/${id}/submission`, headers: { 'idempotency-key': 'h-submit' }, payload: { confirmation: true } })
-    expect(first.json()).toMatchObject({ status: 'not_approved', version: 2 })
+    expect(first.json()).toMatchObject({ status: 'not_approved', version: 5 })
     const replay = await app.inject({ method: 'POST', url: `/api/v1/applications/${id}/submission`, headers: { 'idempotency-key': 'h-submit' }, payload: { confirmation: true } })
     expect(replay.json()).toEqual(first.json())
 

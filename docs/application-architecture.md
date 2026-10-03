@@ -135,8 +135,8 @@ create a package for every record type.
 | Applications | `POST /applications`, `GET /applications/{id}`, `PATCH /applications/{id}` |
 | Loan selection | `PUT /applications/{id}/loan-request` |
 | Customer and finances | `PUT /applications/{id}/customer`, `PUT /applications/{id}/financial-position` |
-| Documents | `POST /applications/{id}/documents`, `GET /applications/{id}/documents` |
-| Processing | `POST /applications/{id}/processing-runs`, `GET /operations/{id}` |
+| Documents | `GET /applications/{id}/document-requirements`, `GET /applications/{id}/documents/demo-pack`, `POST /applications/{id}/documents`, `GET /applications/{id}/documents` |
+| Processing | `POST /applications/{id}/document-processing` |
 | Review | `GET /applications/{id}/review`, `POST /applications/{id}/corrections` |
 | Transactions | `GET /applications/{id}/transactions`, `GET /applications/{id}/transaction-summary` |
 | Submission | `POST /applications/{id}/submission` |
@@ -150,7 +150,10 @@ audit event. Ordinary editable data remains a resource update.
 Document upload uses multipart form data, streams to a controlled local storage
 directory, enforces size and content-type limits, calculates a digest, and stores
 only metadata and a relative storage key in SQLite. Document bytes do not belong
-in the database or API logs.
+in the database or API logs. Intake progresses through identity, payslip, and
+bank-statement stages. Each stage is processed and persisted before the next is
+unlocked, allowing the client to present extracted fields and checks
+progressively and resume the same state after refresh.
 
 ### Future iOS compatibility
 

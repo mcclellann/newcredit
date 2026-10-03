@@ -1,13 +1,16 @@
 # newcredit
 A demonstration of a simplified personal-loan application process.
 
-Four working vertical slices implement Scenario A, B, C, and H
-journeys with a React web client, Fastify/OpenAPI service, SQLite persistence,
-and deterministic assessment fixtures. They cover a new-customer indicative
-approval with simulated funding, an existing-customer referral, and persisted
-document intake that stops at review when a statement is missing and a licence
-number is unreadable. Scenario H adds an unaffordable high-risk application that
-is not approved and cannot create an offer or funds movement.
+Four working vertical slices implement Scenario A, B, C, and H journeys with a
+React web client, Fastify/OpenAPI service, SQLite persistence, and deterministic
+assessment fixtures. Every journey starts with an empty, guided document intake:
+the demonstrator downloads an applicant-specific synthetic ZIP, then uploads
+and processes identity, payslip, and bank-statement evidence one stage at a
+time. Extracted values and checks appear after each stage before the next one is
+unlocked. The scenarios then cover a new-customer indicative approval, an
+existing-customer referral, document review when a statement is missing and a
+licence number is unreadable, and a high-risk application that is not approved
+and cannot create an offer or funds movement.
 
 ## Run locally
 

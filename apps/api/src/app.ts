@@ -7,9 +7,10 @@ import { createHash, randomUUID } from 'node:crypto'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { basename, join } from 'node:path'
 import { tmpdir } from 'node:os'
+import { zipSync } from 'fflate'
 import type { ApplicationStatus, DemoApplication, Disbursement, Offer, Outcome } from '@newcredit/domain'
 import { assertTransition } from '@newcredit/domain'
-import { loadScenario, loadScenarioCDocumentData, type ScenarioId } from '@newcredit/test-fixtures'
+import { loadScenario, loadScenarioDocumentData, type ScenarioId } from '@newcredit/test-fixtures'
 import { createDatabase, migrateDatabase, type ApiDatabase } from './db.js'
 
 const Id = Type.Object({ id: Type.String({ minLength: 1 }) })
@@ -55,6 +56,11 @@ const StoredDocumentSchema = Type.Object({
 const CheckSchema = Type.Object({ documentId: Type.Union([Type.String(), Type.Null()]), check: Type.String(), status: Type.String(), details: Type.String(), data: Type.Record(Type.String(), Type.Unknown()) })
 const FieldSchema = Type.Object({ id: Type.String(), documentId: Type.String(), fieldName: Type.String(), rawValue: Type.String(), normalizedValue: Type.Union([Type.String(), Type.Null()]), confidence: Type.String(), sourceLocation: Type.Record(Type.String(), Type.Unknown()), reviewRequired: Type.Boolean() })
 const AuditSchema = Type.Object({ id: Type.String(), sequence: Type.Integer(), type: Type.String(), at: Type.String(), details: Type.Record(Type.String(), Type.Unknown()) })
+const DocumentRequirementsSchema = Type.Object({
+  expectedCount: Type.Integer(), uploadedCount: Type.Integer(), remainingCount: Type.Integer(),
+  requirements: Type.Array(Type.Object({ type: Type.String(), count: Type.Integer(), text: Type.String(), uploadedCount: Type.Integer(), processedCount: Type.Integer() })),
+  expectedDocuments: Type.Array(Type.Object({ filename: Type.String(), type: Type.String() })),
+})
 
 class HttpProblem extends Error {
   constructor(readonly status: number, readonly title: string, detail: string) { super(detail) }
@@ -116,12 +122,12 @@ export async function buildApp(options: BuildAppOptions = {}) {
     const fixture = await loadScenario(scenarioId)
     const id = randomUUID()
     const timestamp = now()
-    const application: DemoApplication = { id, status: scenarioId === 'scenario-c' ? 'documents_required' : 'ready_to_submit', version: 1, ...fixture.application }
+    const application: DemoApplication = { id, status: 'documents_required', version: 1, ...fixture.application, documents: [], review: null }
     const outcome: Outcome | null = fixture.outcome ? { applicationId: id, ...fixture.outcome } : null
     db.prepare(`INSERT INTO applications
       (id, scenario_id, status, version, snapshot, outcome_snapshot, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`).run(id, scenarioId, application.status, 1, JSON.stringify(application), outcome ? JSON.stringify(outcome) : null, timestamp, timestamp)
-    if (scenarioId === 'scenario-c') db.prepare('INSERT INTO application_audit_events (id, application_id, sequence, type, at, details) VALUES (?, ?, 1, ?, ?, ?)').run(randomUUID(), id, 'synthetic_consent_recorded', timestamp, '{}')
+    db.prepare('INSERT INTO application_audit_events (id, application_id, sequence, type, at, details) VALUES (?, ?, 1, ?, ?, ?)').run(randomUUID(), id, 'synthetic_consent_recorded', timestamp, '{}')
     return reply.code(201).send(application)
   })
 
@@ -142,14 +148,14 @@ export async function buildApp(options: BuildAppOptions = {}) {
   const storageRoot = process.env.NEWCREDIT_UPLOAD_DIR ?? join(tmpdir(), 'newcredit-documents')
   async function persistApprovedDocument(applicationId: string, bytes: Buffer, supplied: { filename: string; mimetype: string }, fixtureDocument: any) {
     const row = getApplicationRow(applicationId)
-    if (row.scenario_id !== 'scenario-c' || !['documents_required', 'processing'].includes(row.status as string)) throw new HttpProblem(409, 'Document Intake Not Allowed', 'Documents are only accepted for a Scenario C application awaiting processing')
+    if (!['documents_required', 'processing'].includes(row.status as string)) throw new HttpProblem(409, 'Document Intake Not Allowed', 'Documents are accepted only while an application awaits processing')
     if (bytes.length > 20 * 1024 * 1024) throw new HttpProblem(413, 'Document Too Large', 'Documents must not exceed 20 MiB')
     const allowed = ['application/pdf', 'image/jpeg', 'image/png']
     if (!allowed.includes(supplied.mimetype)) throw new HttpProblem(415, 'Unsupported Document Type', 'Only PDF, JPEG, and PNG documents are accepted')
     const validMagic = supplied.mimetype === 'application/pdf' ? bytes.subarray(0, 5).toString() === '%PDF-' : supplied.mimetype === 'image/png' ? bytes.subarray(0, 8).equals(Buffer.from([137,80,78,71,13,10,26,10])) : bytes[0] === 0xff && bytes[1] === 0xd8
     if (!validMagic) throw new HttpProblem(415, 'Invalid Document Content', 'Document content does not match its declared media type')
     const hash = `sha256:${createHash('sha256').update(bytes).digest('hex')}`
-    if (!fixtureDocument || fixtureDocument.content_hash !== hash) throw new HttpProblem(422, 'Document Not Recognized', 'This deterministic demo can process only approved synthetic Scenario C documents')
+    if (!fixtureDocument || fixtureDocument.content_hash !== hash) throw new HttpProblem(422, 'Document Not Recognized', 'This deterministic demo can process only approved synthetic documents for this scenario')
     const existing = db.prepare('SELECT id FROM documents WHERE application_id = ? AND source_hash = ?').get(applicationId, hash) as { id: string } | undefined
     if (existing) return documentRows(applicationId).find((document) => document.id === existing.id)
     const extension = supplied.mimetype === 'application/pdf' ? '.pdf' : supplied.mimetype === 'image/png' ? '.png' : '.jpg'
@@ -174,14 +180,44 @@ export async function buildApp(options: BuildAppOptions = {}) {
     return { documents: documentRows(id) }
   })
 
-  app.post('/api/v1/applications/:id/documents', { schema: { tags: ['documents'], params: Id, querystring: Type.Object({ documentType: Type.Union([Type.Literal('bank_statement'), Type.Literal('drivers_licence'), Type.Literal('payslip')]) }), response: { 201: StoredDocumentSchema, 200: StoredDocumentSchema } } }, async (request, reply) => {
+  app.get('/api/v1/applications/:id/document-requirements', { schema: { tags: ['documents'], params: Id, response: { 200: DocumentRequirementsSchema } } }, async (request) => {
     const { id } = request.params as { id: string }
+    const row = getApplicationRow(id)
+    const fixture = await loadScenarioDocumentData(row.scenario_id as ScenarioId)
+    const uploadedCount = documentRows(id).length
+    const counts = new Map<string, number>()
+    fixture.documents.forEach((document: any) => counts.set(document.document_type, (counts.get(document.document_type) ?? 0) + 1))
+    const stored = documentRows(id)
+    return {
+      expectedCount: fixture.documents.length, uploadedCount, remainingCount: fixture.documents.length - uploadedCount,
+      requirements: [...counts].map(([type, count]) => ({
+        type, count, text: `${count} required file${count === 1 ? '' : 's'}`,
+        uploadedCount: stored.filter((document) => document.type === type).length,
+        processedCount: stored.filter((document) => document.type === type && ['processed', 'needs_review'].includes(document.status)).length,
+      })),
+      expectedDocuments: fixture.documents.map((document: any) => ({ filename: basename(document.file), type: document.document_type })),
+    }
+  })
+
+  app.get('/api/v1/applications/:id/documents/demo-pack', { schema: { tags: ['demo', 'documents'], params: Id, produces: ['application/zip'], response: { 200: Type.String({ format: 'binary' }) } } }, async (request, reply) => {
+    const { id } = request.params as { id: string }
+    const row = getApplicationRow(id)
+    const fixture = await loadScenarioDocumentData(row.scenario_id as ScenarioId)
+    const files = Object.fromEntries(fixture.documents.map((document: any) => [basename(document.file), new Uint8Array(document.bytes)]))
+    return reply.type('application/zip').header('content-disposition', `attachment; filename="${row.scenario_id}-demo-pack.zip"`).send(Buffer.from(zipSync(files)))
+  })
+
+  app.post('/api/v1/applications/:id/documents', { schema: { tags: ['documents'], params: Id, querystring: Type.Object({ documentType: Type.Optional(Type.Union([Type.Literal('bank_statement'), Type.Literal('drivers_licence'), Type.Literal('payslip')])) }), response: { 201: StoredDocumentSchema, 200: StoredDocumentSchema } } }, async (request, reply) => {
+    const { id } = request.params as { id: string }
+    const row = getApplicationRow(id)
     const part = await request.file()
     if (!part) throw new HttpProblem(400, 'Document Required', 'A multipart file is required')
     const bytes = await part.toBuffer()
-    const fixtures = await loadScenarioCDocumentData()
+    const fixtures = await loadScenarioDocumentData(row.scenario_id as ScenarioId)
     const hash = `sha256:${createHash('sha256').update(bytes).digest('hex')}`
-    const approved = fixtures.documents.find((document: any) => document.content_hash === hash && document.document_type === (request.query as any).documentType)
+    const approved = fixtures.documents.find((document: any) => document.content_hash === hash)
+    const requestedType = (request.query as any).documentType
+    if (approved && requestedType && approved.document_type !== requestedType) throw new HttpProblem(422, 'Document Type Mismatch', `Uploaded document is ${approved.document_type}, not ${requestedType}`)
     const duplicate = db.prepare('SELECT 1 FROM documents WHERE application_id = ? AND source_hash = ?').get(id, hash)
     const result = await persistApprovedDocument(id, bytes, { filename: part.filename, mimetype: part.mimetype }, approved)
     if (!db.prepare("SELECT 1 FROM application_audit_events WHERE application_id = ? AND type = 'documents_uploaded'").get(id)) {
@@ -193,49 +229,56 @@ export async function buildApp(options: BuildAppOptions = {}) {
     return reply.code(duplicate ? 200 : 201).send(result)
   })
 
-  app.post('/api/v1/applications/:id/documents/stage-demo', { schema: { tags: ['demo', 'documents'], params: Id, response: { 200: Type.Object({ documents: Type.Array(StoredDocumentSchema) }) } } }, async (request) => {
+  app.post('/api/v1/applications/:id/document-processing', { schema: { tags: ['documents'], params: Id, querystring: Type.Object({ documentType: Type.Union([Type.Literal('bank_statement'), Type.Literal('drivers_licence'), Type.Literal('payslip')]) }), response: { 200: ApplicationSchema } } }, async (request) => {
     const { id } = request.params as { id: string }
-    const fixture = await loadScenarioCDocumentData()
-    for (const document of fixture.documents) await persistApprovedDocument(id, document.bytes, { filename: document.file, mimetype: 'application/pdf' }, document)
-    if (!db.prepare("SELECT 1 FROM application_audit_events WHERE application_id = ? AND type = 'documents_uploaded'").get(id)) {
-      db.prepare('INSERT INTO application_audit_events (id, application_id, sequence, type, at, details) VALUES (?, ?, 2, ?, ?, ?)').run(randomUUID(), id, 'documents_uploaded', now(), JSON.stringify({ documentCount: fixture.documents.length }))
-    }
-    const applicationRow = getApplicationRow(id); const application = parse<DemoApplication>(applicationRow.snapshot as string)
-    application.documents = documentRows(id).map((d) => ({ id: d.id, type: d.type, issuer: d.issuer, periodStart: d.periodStart, periodEnd: d.periodEnd, status: d.status }))
-    db.prepare('UPDATE applications SET snapshot = ?, updated_at = ? WHERE id = ?').run(JSON.stringify(application), now(), id)
-    return { documents: documentRows(id) }
-  })
-
-  app.post('/api/v1/applications/:id/document-processing', { schema: { tags: ['documents'], params: Id, response: { 200: ApplicationSchema } } }, async (request) => {
-    const { id } = request.params as { id: string }
+    const { documentType } = request.query as { documentType: 'bank_statement' | 'drivers_licence' | 'payslip' }
     const row = getApplicationRow(id)
-    if (row.scenario_id !== 'scenario-c') throw new HttpProblem(409, 'Processing Not Available', 'Deterministic document processing is available only for Scenario C')
-    if (row.status === 'needs_review') return parse<DemoApplication>(row.snapshot as string)
-    const fixture = await loadScenarioCDocumentData()
+    if (row.status === 'needs_review' || row.status === 'ready_to_submit') return parse<DemoApplication>(row.snapshot as string)
+    if (row.status !== 'documents_required') throw new HttpProblem(409, 'Processing Not Available', `Application is ${row.status}`)
+    const scenarioId = row.scenario_id as ScenarioId
+    const fixture = await loadScenarioDocumentData(scenarioId)
+    const scenario = await loadScenario(scenarioId)
     const documents = documentRows(id)
-    if (documents.length !== fixture.documents.length) throw new HttpProblem(409, 'Documents Incomplete', `All ${fixture.documents.length} approved Scenario C documents must be uploaded before processing`)
+    const expectedStageDocuments = fixture.documents.filter((document: any) => document.document_type === documentType)
+    if (expectedStageDocuments.length === 0) throw new HttpProblem(409, 'Processing Not Available', `No ${documentType} documents are required for this application`)
+    const stageOrder = ['drivers_licence', 'payslip', 'bank_statement']
+    const earlierTypes = stageOrder.slice(0, stageOrder.indexOf(documentType))
+      .filter((type) => fixture.documents.some((document: any) => document.document_type === type))
+    const incompleteEarlierType = earlierTypes.find((type) => {
+      const expected = fixture.documents.filter((document: any) => document.document_type === type)
+      return expected.some((document: any) => {
+        const stored = documents.find((candidate) => candidate.id === `${document.document_id}-${id}`)
+        return !stored || !['processed', 'needs_review'].includes(stored.status)
+      })
+    })
+    if (incompleteEarlierType) throw new HttpProblem(409, 'Previous Document Stage Incomplete', `Process ${incompleteEarlierType} documents before ${documentType} documents`)
+    const stageDocumentIds = new Set(expectedStageDocuments.map((document: any) => `${document.document_id}-${id}`))
+    const uploadedStageDocuments = documents.filter((document) => stageDocumentIds.has(document.id))
+    if (uploadedStageDocuments.length !== expectedStageDocuments.length) throw new HttpProblem(409, 'Documents Incomplete', `All ${expectedStageDocuments.length} ${documentType} documents must be uploaded before processing`)
+    if (uploadedStageDocuments.every((document) => ['processed', 'needs_review'].includes(document.status))) return parse<DemoApplication>(row.snapshot as string)
     return db.transaction(() => {
       const started = now()
-      db.prepare("UPDATE applications SET status = 'processing', updated_at = ? WHERE id = ?").run(started, id)
-      db.prepare("UPDATE documents SET status = 'processing', updated_at = ? WHERE application_id = ?").run(started, id)
-      for (const check of fixture.checks) {
-        const documentId = check.document_id ? `${check.document_id}-${id}` : null
+      for (const documentId of stageDocumentIds) db.prepare("UPDATE documents SET status = 'processing', updated_at = ? WHERE id = ?").run(started, documentId)
+      const stageChecks = fixture.checks.filter((check: any) => documentType === 'bank_statement'
+        ? !check.document_id || !fixture.documents.some((document: any) => document.document_id === check.document_id) || stageDocumentIds.has(`${check.document_id}-${id}`)
+        : stageDocumentIds.has(`${check.document_id}-${id}`))
+      for (const check of stageChecks) {
+        const documentId = fixture.documents.some((document: any) => document.document_id === check.document_id) ? `${check.document_id}-${id}` : null
         db.prepare('INSERT INTO document_checks (application_id, document_id, check_name, status, details, data) VALUES (?, ?, ?, ?, ?, ?)').run(id, documentId, check.check, check.status, check.details, JSON.stringify(check))
       }
-      for (const field of fixture.extractedFields) {
+      for (const field of fixture.extractedFields.filter((field: any) => stageDocumentIds.has(`${field.document_id}-${id}`))) {
         db.prepare('INSERT INTO extracted_fields (id, application_id, document_id, field_name, raw_value, normalized_value, confidence, source_location, review_required) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').run(`${field.field_id}-${id}`, id, `${field.document_id}-${id}`, field.field_name, field.raw_value, field.normalized_value, field.confidence, JSON.stringify(field.source_location), field.review_required ? 1 : 0)
       }
-      for (const document of fixture.documents) db.prepare('UPDATE documents SET status = ?, updated_at = ? WHERE id = ?').run(document.processing_status, now(), `${document.document_id}-${id}`)
-      const events = [
-        [3, 'extraction_needs_review', { reasonCodes: ['REQUIRED_LICENCE_FIELD_UNREADABLE'] }],
-        [4, 'document_checks_need_review', { reasonCodes: ['REQUIRED_STATEMENT_PERIOD_MISSING', 'REQUIRED_LICENCE_FIELD_UNREADABLE'] }],
-        [5, 'application_review_required', {}],
-      ] as const
-      for (const [sequence, type, details] of events) db.prepare('INSERT INTO application_audit_events (id, application_id, sequence, type, at, details) VALUES (?, ?, ?, ?, ?, ?)').run(randomUUID(), id, sequence, type, now(), JSON.stringify(details))
+      for (const document of expectedStageDocuments) db.prepare('UPDATE documents SET status = ?, updated_at = ? WHERE id = ?').run(document.processing_status, now(), `${document.document_id}-${id}`)
       const application = parse<DemoApplication>(row.snapshot as string)
-      application.status = 'needs_review'; application.version += 1
+      application.version += 1
       application.documents = documentRows(id).map((d) => ({ id: d.id, type: d.type, issuer: d.issuer, periodStart: d.periodStart, periodEnd: d.periodEnd, status: d.status }))
-      db.prepare("UPDATE applications SET status = 'needs_review', version = ?, snapshot = ?, updated_at = ? WHERE id = ?").run(application.version, JSON.stringify(application), now(), id)
+      const complete = application.documents.length === fixture.documents.length && application.documents.every((document) => ['processed', 'needs_review'].includes(document.status))
+      application.status = complete ? (scenarioId === 'scenario-c' ? 'needs_review' : 'ready_to_submit') : 'documents_required'
+      if (complete && scenarioId !== 'scenario-c') application.review = scenario.application.review
+      const sequence = (db.prepare('SELECT COALESCE(MAX(sequence), 0) + 1 sequence FROM application_audit_events WHERE application_id = ?').get(id) as { sequence: number }).sequence
+      db.prepare('INSERT INTO application_audit_events (id, application_id, sequence, type, at, details) VALUES (?, ?, ?, ?, ?, ?)').run(randomUUID(), id, sequence, complete ? (scenarioId === 'scenario-c' ? 'application_review_required' : 'application_ready_to_submit') : 'document_stage_processed', now(), JSON.stringify({ documentType }))
+      db.prepare('UPDATE applications SET status = ?, version = ?, snapshot = ?, updated_at = ? WHERE id = ?').run(application.status, application.version, JSON.stringify(application), now(), id)
       return application
     })()
   })
@@ -316,7 +359,7 @@ export async function buildApp(options: BuildAppOptions = {}) {
   app.get('/api/v1/applications/:id/outcome', { schema: { tags: ['applications'], params: Id, response: { 200: OutcomeSchema } } }, async (request) => {
     const row = getApplicationRow((request.params as { id: string }).id)
     if (row.scenario_id === 'scenario-c') throw new HttpProblem(409, 'Outcome Withheld — Review Required', 'No affordability, risk, pricing, or credit outcome exists while document review blockers remain')
-    if (row.status === 'ready_to_submit') throw new HttpProblem(409, 'Outcome Not Available', 'Submit the application first')
+    if (['documents_required', 'processing', 'needs_review', 'ready_to_submit'].includes(row.status as string)) throw new HttpProblem(409, 'Outcome Not Available', 'Submit the application first')
     return parse<Outcome>(row.outcome_snapshot as string)
   })
 
@@ -324,6 +367,7 @@ export async function buildApp(options: BuildAppOptions = {}) {
     const id = (request.params as { id: string }).id
     const application = getApplicationRow(id)
     if (application.scenario_id === 'scenario-c') throw new HttpProblem(409, 'Offer Withheld — Review Required', 'No offer, acceptance, or funding is possible while document review blockers remain')
+    if (['documents_required', 'processing', 'needs_review', 'ready_to_submit'].includes(application.status as string)) throw new HttpProblem(409, 'Offer Not Available', 'Submit the application first')
     if (application.status === 'referred') throw new HttpProblem(409, 'Application Referred', 'This application was referred and no offer was created')
     if (application.status === 'not_approved') throw new HttpProblem(409, 'Application Not Approved', 'This application was not approved and no offer, acceptance, or funding is available')
     const row = db.prepare('SELECT snapshot FROM offers WHERE application_id = ?').get(id) as { snapshot: string } | undefined

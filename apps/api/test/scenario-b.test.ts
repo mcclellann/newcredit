@@ -4,6 +4,7 @@ import Database from 'better-sqlite3'
 import { readFileSync } from 'node:fs'
 import { buildApp } from '../src/app.js'
 import { migrateDatabase } from '../src/db.js'
+import { processPack } from './document-helpers.js'
 
 let app: FastifyInstance | undefined
 afterEach(async () => { await app?.close(); app = undefined })
@@ -50,15 +51,17 @@ describe('Scenario B API', () => {
     const login = await app.inject({ method: 'POST', url: '/api/v1/demo-sessions/login', payload: { scenarioId: 'scenario-b' } })
     expect(login.json()).toMatchObject({ customerName: 'Morgan Sample', simulated: true })
     const created = await app.inject({ method: 'POST', url: '/api/v1/applications', payload: { scenarioId: 'scenario-b' } })
-    expect(created.json()).toMatchObject({ customer: { type: 'existing', existingCustomerReference: 'EXIST-SYN-B-204' }, financialPosition: { assetsTotal: { amountMinor: 500347 }, liabilitiesTotal: { amountMinor: 1934977 }, monthlyDebtRepayments: { amountMinor: 210000 } }, review: { documentChecksPassed: 14 } })
+    expect(created.json()).toMatchObject({ status: 'documents_required', customer: { type: 'existing', existingCustomerReference: 'EXIST-SYN-B-204' }, financialPosition: { assetsTotal: { amountMinor: 500347 }, liabilitiesTotal: { amountMinor: 1934977 }, monthlyDebtRepayments: { amountMinor: 210000 } }, documents: [], review: null })
     expect(created.json().accounts).toEqual(expect.arrayContaining([expect.objectContaining({ ownership: 'joint', applicantShare: 0.4, accountMasked: '••••6813' })]))
     const id = created.json().id
+    const processed = await processPack(app, id, 'scenario-b')
+    expect(processed.json()).toMatchObject({ status: 'ready_to_submit', review: { documentChecksPassed: 14 } })
     const correction = await app.inject({ method: 'POST', url: `/api/v1/applications/${id}/corrections`, payload: { purposeDetail: 'Consolidate verified debts' } })
-    expect(correction.json()).toMatchObject({ originalValue: 'Consolidate synthetic recurring liabilities', currentValue: 'Consolidate verified debts', applicationVersion: 2 })
+    expect(correction.json()).toMatchObject({ originalValue: 'Consolidate synthetic recurring liabilities', currentValue: 'Consolidate verified debts', applicationVersion: 4 })
     const history = await app.inject({ method: 'GET', url: `/api/v1/applications/${id}/corrections` })
     expect(history.json().corrections).toHaveLength(1)
     const submitted = await app.inject({ method: 'POST', url: `/api/v1/applications/${id}/submission`, headers: { 'idempotency-key': 'b-submit' }, payload: { confirmation: true } })
-    expect(submitted.json()).toMatchObject({ status: 'referred', version: 3 })
+    expect(submitted.json()).toMatchObject({ status: 'referred', version: 5 })
     const outcome = await app.inject({ method: 'GET', url: `/api/v1/applications/${id}/outcome` })
     expect(outcome.json()).toMatchObject({ decision: 'referred', riskScore: 488, riskBand: 'moderate', monthlySurplus: { amountMinor: 48806 } })
     expect((await app.inject({ method: 'GET', url: `/api/v1/applications/${id}/offer` })).statusCode).toBe(409)

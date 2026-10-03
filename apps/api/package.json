@@ -21,7 +21,8 @@
     "@sinclair/typebox": "^0.34.41",
     "better-sqlite3": "^12.4.1",
     "drizzle-orm": "^0.44.5",
-    "fastify": "^5.6.1"
+    "fastify": "^5.6.1",
+    "fflate": "^0.8.3"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
