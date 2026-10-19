@@ -1,4 +1,4 @@
-import type { Application, Correction, DemoLogin, Disbursement, DocumentRequirements, DocumentReview, DocumentType, Offer, Outcome, StoredDocument } from './types'
+import type { Application, ApplicationDetails, Correction, DemoLogin, Disbursement, DocumentRequirements, DocumentReview, DocumentType, Offer, Outcome, StoredDocument } from './types'
 
 const base = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
 
@@ -23,13 +23,13 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
 const key = () => crypto.randomUUID()
 export const api = {
-  scenarios: () => request<unknown>('/demo-scenarios'),
-  createSession: () => request<unknown>('/demo-sessions', { method: 'POST', body: JSON.stringify({ scenarioId: 'scenario-a' }) }),
-  login: (scenarioId: 'scenario-b' | 'scenario-h' = 'scenario-b') => request<DemoLogin>('/demo-sessions/login', { method: 'POST', body: JSON.stringify({ scenarioId }) }),
-  createApplication: (scenarioId: 'scenario-a' | 'scenario-b' | 'scenario-c' | 'scenario-h' = 'scenario-a') => request<Application>('/applications', { method: 'POST', body: JSON.stringify({ scenarioId }) }),
+  login: () => request<DemoLogin>('/demo-sessions/login', { method: 'POST', body: '{}' }),
+  createApplication: (customerType: 'new' | 'existing') => request<Application>('/applications', { method: 'POST', body: JSON.stringify({ customerType }) }),
+  saveDetails: (id: string, details: ApplicationDetails) => request<Application>(`/applications/${id}/details`, { method: 'PUT', body: JSON.stringify(details) }),
+  removeDocument: (id: string, documentId: string) => request<Application>(`/applications/${id}/documents/${documentId}`, { method: 'DELETE' }),
   application: (id: string) => request<Application>(`/applications/${id}`),
   documentRequirements: (id: string) => request<DocumentRequirements>(`/applications/${id}/document-requirements`),
-  documentPackUrl: (id: string) => `${base}/api/v1/applications/${id}/documents/demo-pack`,
+  documentPackUrl: (id: string, pack: string) => `${base}/api/v1/applications/${id}/documents/demo-pack?pack=${encodeURIComponent(pack)}`,
   documents: (id: string) => request<{ documents: StoredDocument[] }>(`/applications/${id}/documents`),
   uploadDocument: async (id: string, documentType: DocumentType, file: File) => {
     const body = new FormData(); body.append('file', file)

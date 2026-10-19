@@ -25,7 +25,7 @@ export type DocumentSummary = {
 
 export type DemoApplication = {
   id: string
-  scenarioId: 'scenario-a' | 'scenario-b' | 'scenario-c' | 'scenario-h'
+  scenarioId: 'document-driven' | 'scenario-a' | 'scenario-b' | 'scenario-c' | 'scenario-h'
   status: ApplicationStatus
   version: number
   fixedDemonstrationDate: string
@@ -53,6 +53,14 @@ export type DemoApplication = {
     liabilitiesTotal: Money
     monthlyDebtRepayments: Money
   }
+  declarations?: {
+    adults: 1 | 2; dependants: number; inWorkforce: boolean
+    declaredLivingMinor: number; declaredHousingMinor: number; declaredDebtRepaymentsMinor: number
+    otherCommitmentsMinor: number; assetsMinor: number; liabilitiesMinor: number
+    allAccountsConfirmed: boolean; incomeContinuing: boolean; foreseeableChanges: string
+    confirmed: boolean; classifications: Record<string, string>
+  }
+  transactions?: Array<{ id: string; documentId: string; date: string; description: string; amountMinor: number; balanceMinor: number; account: string; category: string }>
   review: {
     monthlyNetIncome: Money
     assessedLivingExpenses: Money
@@ -67,7 +75,7 @@ export type Outcome = {
   applicationId: string
   decision: 'indicatively_approved' | 'referred' | 'not_approved'
   riskScore: number
-  riskBand: 'very_low' | 'moderate' | 'high'
+  riskBand: 'very_low' | 'low' | 'moderate' | 'elevated' | 'high' | 'severe'
   affordability: 'affordable' | 'unaffordable'
   monthlySurplus: Money
   reasons: string[]
@@ -125,3 +133,5 @@ export function assertTransition(from: ApplicationStatus, to: ApplicationStatus)
     throw new Error(`Invalid application transition: ${from} -> ${to}`)
   }
 }
+
+export { assessApplication, classifyTransaction, type Transaction, type AssessmentInput, type AssessmentResult } from './assessment.js'

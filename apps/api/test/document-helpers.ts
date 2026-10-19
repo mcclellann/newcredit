@@ -1,5 +1,13 @@
-import type { FastifyInstance } from 'fastify'
-import { loadScenarioDocumentData, type ScenarioId } from '@newcredit/test-fixtures'
+/** Valid image-only analogue: a PDF page with no text layer. */
+export function blankPdf() {
+  const objects = ['<< /Type /Catalog /Pages 2 0 R >>', '<< /Type /Pages /Kids [3 0 R] /Count 1 >>', '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << >> /Contents 4 0 R >>', '<< /Length 0 >>\nstream\n\nendstream']
+  let text = '%PDF-1.4\n'
+  const offsets = [0]
+  for (const [index, object] of objects.entries()) { offsets.push(Buffer.byteLength(text)); text += `${index + 1} 0 obj\n${object}\nendobj\n` }
+  const xref = Buffer.byteLength(text)
+  text += `xref\n0 5\n0000000000 65535 f \n${offsets.slice(1).map(n => `${String(n).padStart(10, '0')} 00000 n \n`).join('')}trailer\n<< /Size 5 /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`
+  return Buffer.from(text)
+}
 
 export function multipart(content: Buffer, filename: string, type = 'application/pdf') {
   const boundary = 'newcredit-test-boundary'
@@ -7,30 +15,4 @@ export function multipart(content: Buffer, filename: string, type = 'application
     headers: { 'content-type': `multipart/form-data; boundary=${boundary}` },
     payload: Buffer.concat([Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="${filename}"\r\nContent-Type: ${type}\r\n\r\n`), content, Buffer.from(`\r\n--${boundary}--\r\n`)]),
   }
-}
-
-export async function uploadPack(app: FastifyInstance, applicationId: string, scenarioId: ScenarioId) {
-  const fixture = await loadScenarioDocumentData(scenarioId)
-  for (const document of fixture.documents) {
-    const response = await app.inject({ method: 'POST', url: `/api/v1/applications/${applicationId}/documents`, ...multipart(document.bytes, document.file) })
-    if (response.statusCode !== 201) throw new Error(`Upload failed: ${response.statusCode} ${response.body}`)
-  }
-  return fixture
-}
-
-export async function processPack(app: FastifyInstance, applicationId: string, scenarioId: ScenarioId) {
-  const fixture = await loadScenarioDocumentData(scenarioId)
-  let response
-  for (const documentType of ['drivers_licence', 'payslip', 'bank_statement'] as const) {
-    const documents = fixture.documents.filter((document: any) => document.document_type === documentType)
-    if (documents.length === 0) continue
-    for (const document of documents) {
-      const upload = await app.inject({ method: 'POST', url: `/api/v1/applications/${applicationId}/documents?documentType=${documentType}`, ...multipart(document.bytes, document.file) })
-      if (upload.statusCode !== 201) throw new Error(`Upload failed: ${upload.statusCode} ${upload.body}`)
-    }
-    response = await app.inject({ method: 'POST', url: `/api/v1/applications/${applicationId}/document-processing?documentType=${documentType}` })
-    if (response.statusCode !== 200) throw new Error(`Processing failed: ${response.statusCode} ${response.body}`)
-  }
-  if (!response) throw new Error('Scenario has no document requirements')
-  return response
 }

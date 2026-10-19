@@ -50,4 +50,13 @@ export function migrateDatabase(sqlite: Database.Database): void {
       sqlite.pragma('foreign_keys = ON')
     }
   }
+  if ((sqlite.pragma('user_version', { simple: true }) as number) < 5) {
+    const migration = fileURLToPath(new URL('../drizzle/0004_document_driven.sql', import.meta.url))
+    sqlite.pragma('foreign_keys = OFF')
+    try {
+      sqlite.exec(`BEGIN IMMEDIATE;\n${readFileSync(migration, 'utf8')}\nPRAGMA user_version = 5;\nCOMMIT;`)
+    } finally {
+      sqlite.pragma('foreign_keys = ON')
+    }
+  }
 }

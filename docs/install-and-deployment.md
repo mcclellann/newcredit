@@ -7,9 +7,12 @@ steps. Commands are shown without a `$` prompt so you can copy entire blocks.
 ## 1. What works today, and what does not
 
 The current implementation includes React/Vite, Fastify/OpenAPI, SQLite,
-progressive document uploads, and scenarios A, B, C, and H. Documents and
-assessment results use deterministic synthetic fixtures; this is not live OCR,
-identity verification, production authentication, or a real lending service.
+progressive document uploads and document-driven assessment. A, B, C and H are
+optional sample packs, not prescribed outcomes. Supported text-PDF layouts are
+parsed from their contents, not recognised only by approved hashes. Arbitrary
+synthetic PDFs using supported layouts can be supplied, but arbitrary layouts
+cannot. There is no OCR, document-authenticity/fraud detection, identity
+verification, production authentication or real lending service.
 
 The commands below run the **development demonstration**. Tests, builds,
 migrations, and the shared command sequence have been exercised in an Amp Linux
@@ -287,14 +290,13 @@ sqlite3 "$DATABASE_URL" 'PRAGMA user_version; PRAGMA integrity_check;'
 Run each command successfully before continuing. Expected results:
 
 - Typecheck and build exit without errors.
-- The current test suite reports 18 passing tests across the web, API, and domain
-  packages. Future revisions may add tests.
+- The web, API and domain test suites exit successfully; test counts vary by revision.
 - Migration prints `Database migrations are up to date.`
-- SQLite currently reports schema version `4`, then `ok`.
+- SQLite currently reports schema version `5`, then `ok`.
 
 Migrations are safe to rerun; they apply only outstanding schema versions. There
-is no separate seed command: the scenario fixtures are loaded when you create
-an application through the UI.
+is no separate seed command: applications start empty, with derived values built
+from uploaded evidence and declarations rather than selected scenario fixtures.
 
 ## 7. Start the demonstration using two terminals
 
@@ -359,21 +361,32 @@ portal instead when reviewing an Amp-hosted preview.
 
 ### Walk through the app
 
-1. Choose **New customer** for the Avery approval journey.
-2. Download the synthetic test ZIP and extract it using Explorer or Finder.
-3. At identity, choose `drivers-licence.pdf` and upload/process it.
-4. Confirm the identity fields appear and the payslip stage unlocks.
-5. Select the four `payslip-*.pdf` files together and upload/process them.
-6. Confirm extracted pay and arithmetic checks appear.
-7. Select the three `bank-statement-*.pdf` files and upload/process them.
-8. Review balances and classified-transaction output, then continue to review.
-9. Submit, inspect the indicative outcome, and optionally exercise the simulated
-   offer/funding journey. No real money moves.
-
-Other examples: Morgan is referred; Casey surfaces an unreadable licence and
-missing statement progressively and cannot submit; Taylor is not approved and
-has no offer or funding. Use each applicant's own ZIP, not another scenario's
-documents. Unknown or modified files are deliberately rejected.
+1. Choose **New customer** or the simulated existing-customer login. Both start
+   empty and require identity evidence; login does not verify identity.
+2. Optionally download a sample ZIP and extract it using Explorer or Finder.
+   Pack B lacks identity; older H packs without identity are also incomplete
+   (the current H manifest includes a licence). Supply
+   consistent supported identity evidence to proceed; there is no bypass and
+   mixing another person's identity into a pack does not resolve it.
+3. Upload/process a supported driver's-licence text PDF, then payslips and bank
+   statements. Inspect extracted fields, arithmetic and reconciliation issues.
+4. Use the fixed assessment date **1 October 2026**, not today's date. Supply
+   complete, non-overlapping statements for **1 July–30 September 2026** for
+   every account with transactions, with consistent adjoining balances.
+5. Payslips paid **1 August–30 September 2026** must cover at least 56 days of
+   non-overlapping pay periods, with recent evidence at September end within
+   the pay cadence. Weekly, fortnightly and monthly frequencies are supported.
+6. Confirm categories for every unknown or cash transaction. Cash is not
+   automatically gambling. Only matched transfers between uploaded accounts
+   are excluded as internal transfers.
+7. Complete contact and specific loan-purpose details and confirm household,
+   expenses, commitments, assets/liabilities, continuing income and that all
+   accounts have been supplied. Foreseeable changes other than blank/“none”
+   require review; salary credits and payslip income must reconcile within 20%.
+8. Resolve all evidence and declaration blockers before submitting. The result
+   depends on documents and declarations, not pack choice. Scores are approximate
+   demonstration heuristics, not calibrated default predictions. Only eligible
+   outcomes can proceed to simulated offers/funding; no real money moves.
 
 ### Stop and start again
 
@@ -395,7 +408,8 @@ runtime/document-tools/bin/python -m pip install -r requirements-docs.txt
 
 The virtual environment stays in the Git-ignored `runtime/` directory. Read the generator
 and synthetic-data policy before running generation: regenerated files can
-change the approved document hashes, fixtures, and demo results. A plain install
+change extracted evidence and demo results. Hashes identify stored bytes and
+duplicates, not an extraction allowlist. A plain install
 does not require executing `scripts/generate-synthetic-documents.py`.
 
 ## 9. Updates, backups, and rollback
@@ -439,6 +453,12 @@ pnpm build
 . ./runtime/demo.env
 pnpm db:migrate
 ```
+
+Check `sqlite3 "$DATABASE_URL" 'PRAGMA user_version; PRAGMA integrity_check;'`
+reports `5` and `ok`. Both dependency installation and migration are required
+for this update. Old fixture-based drafts must restart as new document-driven
+applications; legacy fixture assessments are read-only, not converted evidence.
+Do not delete the database to bypass missing evidence or migration requirements.
 
 Then restart both terminals as in Section 7. Record `git rev-parse HEAD` again.
 For a controlled release, use an owner-approved tag or revision rather than
@@ -592,14 +612,18 @@ ports or bind to `0.0.0.0` as an unexplained workaround.
 ### Upload rejected, or the next step stays locked
 
 - Extract the ZIP first; upload PDFs, not the ZIP itself.
-- Use the current applicant's pack and the correct files for the active stage.
-- Select the displayed remaining file count. Duplicate files do not fill a
-  missing requirement.
-- PDF, JPEG, and PNG uploads are accepted up to 20 MiB, but this deterministic
-  demo recognises only its approved synthetic bytes.
-- Read the per-file error, choose the remaining correct files, and retry.
-- A Casey licence may be processed but still need review; this is deliberate.
-  Submission and assessment remain withheld until the fixture blockers resolve.
+- Supply consistent applicant evidence and the correct document type for the stage.
+  Duplicate files do not fill coverage gaps; remove overlapping evidence.
+- Uploads accept PDF, JPEG and PNG up to 20 MiB, but extraction supports text
+  PDFs only (at most 20 pages, with text-size limits). Images and scanned PDFs
+  need OCR/manual review, which this demo does not perform.
+- Read per-file errors for unsupported layouts, missing fields, dates and
+  arithmetic/reconciliation failures. Modified PDFs are not rejected merely
+  because their hash differs; their parsed contents must meet the checks.
+- B lacks identity; older H packs without identity are incomplete too, although
+  the current H manifest includes a licence. C has incomplete/problematic evidence. These
+  samples do not bypass submission gates. There is no implemented manual-review
+  override that makes incomplete evidence eligible for automated assessment.
 
 ### What to include in a support report
 

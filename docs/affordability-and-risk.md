@@ -1,6 +1,7 @@
 # Affordability and Credit-Risk Methodology
 
-**Status:** Draft v0.1  
+**Status:** Implemented demonstration methodology; not a production risk model
+
 **Scope:** Synthetic Australian personal-loan demonstration only
 
 ## 1. Important distinction
@@ -18,6 +19,36 @@ document check withholds both results until review. The score is not calibrated
 to a probability of default because the demonstration has no representative
 historical performance data.
 
+### Implemented evidence contract
+
+Applications start empty on both customer paths; simulated existing-customer
+login does not replace identity evidence. The fixed assessment date is
+**1 October 2026**. Every account with transactions needs complete daily statement
+coverage for **1 July–30 September 2026**, without overlapping periods and with
+consistent adjoining balances. Payslips paid in **August–September 2026** must
+cover at least 56 non-overlapping pay-period days and be recent at September end
+within the supported weekly, fortnightly or monthly cadence.
+
+Supported text PDFs are parsed from their contents, including arbitrary synthetic
+documents in supported layouts, rather than an approved-hash allowlist. There is
+no OCR, document authenticity/fraud detection or external identity verification.
+Checks cover required fields, dates, cross-document names, identity age/expiry,
+pay arithmetic and statement reconciliation; they do not prove genuine evidence.
+Packs A/B/C/H are optional samples, not outcome selectors. B lacks identity and
+is incomplete; older H packs without identity are incomplete too (the current H
+manifest includes a licence). Neither path bypasses that requirement.
+
+Submission requires confirmed household, expenses, commitments and loan details,
+all-account and continuing-income declarations, contact details and specific
+purpose. Non-empty foreseeable changes other than “none” require review.
+Unknown/cash transactions must all be classified, even below the domain's
+AUD 100/month materiality threshold. Payslip and statement salary amounts must
+reconcile within 20%; income used is the lower of normalized payslip income and
+average statement salary credits, with salary required in each observed month.
+Old fixture-based drafts must restart; schema 5 preserves legacy records but
+does not convert them into document-driven assessments. Updating requires
+`pnpm install --frozen-lockfile` and `pnpm db:migrate` after backup.
+
 ## 2. Product boundary
 
 - Minimum request: AUD 5,000
@@ -34,7 +65,7 @@ fees, and repayment—not with the amount alone.
 
 ## 3. Responsible-lending basis
 
-For the demonstration, the assessment records:
+The responsible-lending requirements motivating the demonstration include:
 
 - the applicant's requirements and objectives, including a specific loan
   purpose;
@@ -53,7 +84,10 @@ This follows ASIC's current description of responsible lending: make reasonable
 inquiries into financial circumstances and requirements and objectives, take
 reasonable verification steps, and assess whether the contract is not
 unsuitable. It is a product requirement, not legal advice or a statement that
-the demonstration satisfies Australian law.
+the demonstration satisfies Australian law. The implemented declaration and
+extraction gates above are narrower than a production verification process:
+there are no bureau, merchant-verification or authenticity checks, automated
+substantiation of joint expense shares, or full foreseeable-change modelling.
 
 ## 4. Demonstration Living Expense Benchmark
 
@@ -93,8 +127,17 @@ The complete source table, conversion, lookup rules, and limitations are in the
 
 ## 5. Monthly affordability calculation
 
-All frequencies are retained at source and normalized to monthly equivalents
-using one versioned conversion table.
+Payslip frequencies are retained at source and normalized using weekly × 52/12,
+fortnightly × 26/12 and monthly × 1, then averaged. Statement amounts are
+aggregated over the three-month observation window.
+
+Implemented living expenses are the maximum of declared living expenses, DLEB,
+and observed monthly living + cash + unknown debits + gambling + payment-stress
+debits. Housing and debt each use the greater of declared and observed amounts;
+short-term-credit repayments are included in debt. Other declared commitments
+are added separately. Only one-to-one same-day equal/opposite transactions
+labelled “transfer” on both sides across distinct uploaded accounts are excluded
+as internal transfers; unknown counterparties are not assumed internal.
 
 `assessed outgoings = assessed general living expenses + housing + existing debt repayments + other fixed commitments`
 
@@ -139,8 +182,8 @@ values produce a composite risk value from 0 to 100:
 | Post-loan capacity | 25% | Affordability surplus ratio |
 | Payment stress | 20% | Dishonours, reversed payments, arrears, overdraft fees |
 | Existing debt burden | 15% | Debt repayments as a share of verified net income |
-| Cash-flow and balance stability | 15% | Monthly net cash flow and negative-balance days |
-| Income stability | 10% | Pay-cycle normalized income variation and continuity |
+| Cash-flow and balance stability | 15% | Monthly net cash flow and observed negative-balance transaction dates |
+| Income stability | 10% | Monthly salary range divided by maximum monthly salary |
 | Gambling activity | 10% | Classified gambling debits as income share and frequency |
 | Short-term credit use | 5% | Payday, wage-advance, and BNPL repayment events |
 
@@ -148,13 +191,21 @@ values produce a composite risk value from 0 to 100:
 
 ### Factor thresholds
 
-| Risk value | Capacity: surplus ratio | Debt repayments / net income | Payment-stress events in 3 months | Negative-balance behaviour | Pay-cycle income variation | Gambling / net income | Short-term credit events |
+| Risk value | Capacity: surplus ratio | Debt repayments / net income | Payment-stress events in 3 months | Negative-balance behaviour | Monthly salary variation | Gambling / net income | Short-term credit events |
 | ---: | --- | --- | --- | --- | --- | --- | ---: |
 | 0 | ≥20% | ≤10% | 0 | 0 days and positive cash flow each month | <5% | 0% and 0 events | 0 |
 | 25 | 10–<20% | >10–20% | 1 | 1–3 days or one flat month | 5–<10% | >0–1% or 1–2 events | 1 |
 | 50 | 5–<10% | >20–30% | 2 | 4–10 days or one negative month | 10–<20% | >1–3% or 3–5 events | 2 |
 | 75 | 0–<5% | >30–40% | 3–4 | 11–20 days or two negative months | 20–<35% | >3–7% or 6–10 events | 3 |
-| 100 | <0% | >40% | ≥5 | >20 days or all three months negative | ≥35% or income not continuing | >7% or >10 events | ≥4 |
+| 100 | <0% | >40% | ≥5 | >20 observed dates or all three months negative | ≥35% | >7% or >10 events | ≥4 |
+
+“Days” in this table means distinct observed transaction dates with a negative
+balance, not reconstructed daily balances. Monthly salary variation is an
+approximation affected by pay-cycle timing, not pay-cycle-normalized volatility.
+Non-continuing income is a submission gate, not an added score penalty. Counts
+and negative months/dates are normalized to three months in the domain function.
+These implemented signals are approximate description-based heuristics, not
+validated production measures or calibrated risk prediction.
 
 For a factor with two tests, use the higher risk value. Gambling activity means
 transactions positively classified as gambling; ordinary cash withdrawals are
@@ -172,7 +223,7 @@ silently increase the score.
 | 400–599 | Moderate | Mixed indicators that warrant closer assessment |
 | 600–749 | Elevated | Multiple or material indicators of repayment risk |
 | 750–899 | High | Serious capacity or payment-stress indicators |
-| 900–1000 | Severe | Extreme observed stress; default risk appears highest in the demonstration set |
+| 900–1000 | Severe | Highest heuristic stress band; no measured default probability |
 
 No band is labelled “will default.” Default is never certain, and these labels
 do not estimate a real probability of default. Calibration would require a
@@ -207,7 +258,9 @@ it must not label the nominal rate as a comparison rate.
 
 Apply rules in this order:
 
-1. Missing, conflicting, or suspicious required evidence → **outcome withheld**.
+1. Missing, conflicting, unsupported or unreconciled required evidence, or
+   unconfirmed declarations/classifications → **outcome withheld**. This does
+   not imply implemented fraud/authenticity detection.
 2. Unaffordable → **not approved** regardless of score.
 3. Marginal affordability → **referred** regardless of score.
 4. Affordable and score 1–399 → **indicatively approved**.
@@ -216,7 +269,15 @@ Apply rules in this order:
 
 Every result shows the affordability calculation, score version, band, three
 largest adverse factors, material positive factors, and plain-language reasons.
-Document-integrity signals appear separately and do not add score points.
+Extraction/reconciliation issues are submission blockers, not score points or
+proof of document integrity. The legacy domain result represents review-held
+results as `referred` with `riskScore: 0` and no factors; zero is a sentinel,
+not low risk, and the API withholds submission/outcome while blockers remain.
+Marginal non-negative surplus also maps to `referred`; the legacy affordability
+field says `affordable`, so reasons and buffer checks distinguish marginal cases.
+High-score/negative-surplus results may include illustrative calculations but
+cannot create an offer. None of these results predicts that an applicant will
+default.
 
 ## 10. References
 

@@ -1,16 +1,24 @@
 # newcredit
 A demonstration of a simplified personal-loan application process.
 
-Four working vertical slices implement Scenario A, B, C, and H journeys with a
-React web client, Fastify/OpenAPI service, SQLite persistence, and deterministic
-assessment fixtures. Every journey starts with an empty, guided document intake:
-the demonstrator downloads an applicant-specific synthetic ZIP, then uploads
-and processes identity, payslip, and bank-statement evidence one stage at a
-time. Extracted values and checks appear after each stage before the next one is
-unlocked. The scenarios then cover a new-customer indicative approval, an
-existing-customer referral, document review when a statement is missing and a
-licence number is unreadable, and a high-risk application that is not approved
-and cannot create an offer or funds movement.
+The React client, Fastify/OpenAPI service and SQLite persistence implement a
+document-driven demonstration, not prescribed scenario outcomes. Both new and
+existing customers start empty and must supply identity, payslip and statement
+evidence. Supported text-PDF layouts are parsed from their contents, including
+arbitrary synthetic PDFs outside the supplied packs; extraction is not a hash
+allowlist. There is no OCR, identity verification or document-authenticity/fraud
+detection. Unsupported layouts and incomplete evidence block submission.
+
+The fixed assessment date is **1 October 2026**: statements must cover every day
+of July–September for every account with transactions; payslips paid in
+August–September must cover at least eight weeks and be recent at September end.
+Unknown and cash transactions require category confirmation, alongside household,
+expense, commitment, continuing-income and all-account declarations, contact
+details and a specific loan purpose. Outcomes follow evidence and declarations;
+the approximate heuristic score is not a calibrated prediction of default.
+Packs A, B, C and H are optional samples, not guaranteed journeys. B lacks
+identity and is incomplete; older H packs without identity are incomplete too
+(the current H manifest includes a licence). There is no existing-customer bypass.
 
 ## Run locally
 
@@ -40,6 +48,12 @@ The web app runs at `http://localhost:5173` and proxies `/api` to the API on
 `http://127.0.0.1:3001`. Both commands stay in the foreground; stop them with
 Ctrl+C. All application records and documents are synthetic. This runs the
 development demo, not an unattended production deployment.
+
+When updating, stop the servers and back up first, then run
+`pnpm install --frozen-lockfile` and `pnpm db:migrate` (current SQLite schema: 5).
+Old fixture-based drafts must restart as new document-driven applications;
+migration does not turn their saved outcomes into evidence-based assessments.
+See the installation guide for the complete update and backup procedure.
 
 Useful checks:
 

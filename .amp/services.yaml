@@ -9,4 +9,4 @@ services:
     agent: control
     portal:
       title: NewCredit demo
-      description: Run the Scenario A, B, C, and H personal-loan demonstrations with synthetic data.
+      description: Run a document-driven personal-loan demonstration with synthetic data.

@@ -75,3 +75,8 @@ export const applicationAuditEvents = sqliteTable('application_audit_events', {
   id: text('id').primaryKey(), applicationId: text('application_id').notNull().references(() => applications.id),
   sequence: integer('sequence').notNull(), type: text('type').notNull(), at: text('at').notNull(), details: text('details').notNull(),
 }, (table) => [uniqueIndex('application_audit_events_sequence_unique').on(table.applicationId, table.sequence)])
+
+export const documentExtractions = sqliteTable('document_extractions', {
+  documentId: text('document_id').primaryKey().references(() => documents.id, { onDelete: 'cascade' }),
+  parsed: text('parsed').notNull(),
+})
