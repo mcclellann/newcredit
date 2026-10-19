@@ -1,227 +1,608 @@
-# Installation and Deployment
+# Installation and Deployment — Step-by-Step Operator Guide
 
-**Status:** Scenario A, B, C, and H development workflows implemented; production packaging remains planned
+This guide starts with a new machine and ends with the synthetic loan demo
+running in a browser. Choose **Windows/WSL2** or **macOS**, then follow the shared
+steps. Commands are shown without a `$` prompt so you can copy entire blocks.
 
-**Targets:** Windows 11 with WSL2, and native macOS
+## 1. What works today, and what does not
 
-## 1. Current repository status
+The current implementation includes React/Vite, Fastify/OpenAPI, SQLite,
+progressive document uploads, and scenarios A, B, C, and H. Documents and
+assessment results use deterministic synthetic fixtures; this is not live OCR,
+identity verification, production authentication, or a real lending service.
 
-The repository contains working Scenario A, B, C, and H web/API vertical slices,
-including persisted synthetic document intake, review-required processing, and
-an unaffordable high-risk outcome that blocks offers and funding.
-Dependency installation, build, tests, SQLite migration, OpenAPI generation,
-and local development commands are implemented and exercised in an Amp Linux
-orb. Clean checkout verification on Windows/WSL2 and native macOS remains
-required before either platform is called a supported packaged deployment.
+The commands below run the **development demonstration**. Tests, builds,
+migrations, and the shared command sequence have been exercised in an Amp Linux
+orb. The Windows installation, Windows-to-WSL networking, and native macOS
+prerequisite steps still require testing on those operating systems. Do not
+interpret this guide as certification of a production deployment.
 
-## 2. Shared deployment shape
+Unattended startup, systemd/launchd service files, packaged production execution,
+and a configured public tunnel are not supplied yet. You do not need a public
+IP address, Caddy, or a tunnel to run the demo on the machine itself.
 
-Both targets use the same built application and operational model:
+### Before you begin
 
-```text
-outbound proxy/tunnel
-        │
-        ▼
-local reverse proxy ──▶ static React files
-        │
-        └─────────────▶ Fastify on loopback ──▶ worker ──▶ SQLite/files
+- Allow time for the first dependency download and possible native compilation.
+- You need Internet access for GitHub, Node.js, and the package registry.
+- You need permission to read `mcclellann/newcredit` on GitHub.
+- Use synthetic information only. Never upload real licences, payslips, or bank
+  statements.
+- Do not run application commands with `sudo` or as Administrator.
+- Keep your checkout and runtime files out of OneDrive, iCloud Drive, network
+  shares, and other synchronised folders.
+
+## 2. Windows 11: install Ubuntu under WSL2
+
+### 2.1 Install WSL — Windows PowerShell, as Administrator
+
+Open Start, search for **PowerShell**, right-click it, and choose **Run as
+administrator**. Run:
+
+```powershell
+wsl --install -d Ubuntu-24.04
 ```
 
-- The web application and `/api/v1` share one origin.
-- Fastify and the worker are never directly exposed to a LAN or public network.
-- The proxy or tunnel initiates outbound; no inbound public IP or router port
-  forwarding is required.
-- Caddy is the preferred local reverse proxy because the same configuration can
-  run in WSL2 and macOS. An existing equivalent proxy is acceptable.
-- SQLite, uploads, and generated documents remain local to the host.
-- Application behaviour, migrations, seed data, and backup format are identical
-  on both platforms.
+If Windows requests a restart, restart before continuing. Launch **Ubuntu
+24.04** from Start. On first launch, create a Linux username and password.
+The password is separate from your Windows password; nothing is displayed
+while typing it, which is normal.
 
-## 3. Version and package management
+If WSL is already installed, inspect it from PowerShell:
 
-Implementation must commit:
+```powershell
+wsl --list --verbose
+```
 
-- a `.node-version` containing the supported Node.js active-LTS version;
-- the exact pnpm version in `package.json` through `packageManager`;
-- `pnpm-lock.yaml`;
-- `.env.example` containing names and safe example values only; and
-- a single platform-neutral workspace command surface.
+The Ubuntu distribution should show version `2`. If it shows version `1`:
 
-Developers may use any Node version manager that respects `.node-version`.
-Corepack supplies the pinned pnpm version. Do not require a global npm-installed
-pnpm or maintain different package manifests for Windows and macOS.
+```powershell
+wsl --set-version Ubuntu-24.04 2
+```
 
-`better-sqlite3` may need native compilation when a matching prebuilt binary is
-not available. Windows users compile inside Linux/WSL2, not with Windows build
-tools. macOS users need Apple's Command Line Tools.
+Use the distribution name actually printed by `wsl --list --verbose` if it
+differs. These commands and the examples below use `Ubuntu-24.04`.
 
-## 4. Required command interface
+### 2.2 Install Linux prerequisites — Ubuntu terminal
 
-The completed application must provide and document these commands with the same
-behaviour on macOS and inside WSL2:
+All remaining Windows setup commands run **inside Ubuntu**, not PowerShell,
+Command Prompt, or Git Bash:
 
-| Command | Required behaviour |
-| --- | --- |
-| `corepack enable` | Make the pinned pnpm version available |
-| `pnpm install --frozen-lockfile` | Reproduce dependencies without changing the lockfile |
-| `pnpm dev` | Start the Fastify API and Vite web client for local development |
-| `pnpm build` | Build the API packages and static web assets |
-| `pnpm db:migrate` | Apply committed SQLite migrations once and safely |
-| `pnpm test` | Run non-browser automated tests |
-| `pnpm typecheck` | Check all TypeScript packages without emitting output |
-| `pnpm openapi:generate` | Refresh the committed OpenAPI 3.1 contract |
+```bash
+sudo apt-get update
+sudo apt-get install -y git curl ca-certificates build-essential python3 python3-venv sqlite3
+git --version
+python3 --version
+uname -m
+```
 
-The worker, production start/supervision, seed, healthcheck, backup, and restore
-commands remain part of the later deployment milestone; they are not falsely
-exposed as implemented commands in this slice.
+The compiler and Python support `better-sqlite3` if a prebuilt binary is not
+available. `sqlite3` is used for health checks and backups later in this guide.
 
-Build, migration, seed, backup, and restore commands must exit non-zero on
-failure. Start commands remain foreground processes so systemd, launchd, or a
-developer terminal can supervise them correctly.
+Keep the repository on the Linux filesystem, for example `~/src/newcredit`,
+**not** `/mnt/c/Users/...`. This improves file-watcher behaviour and avoids
+SQLite/filesystem complications.
 
-## 5. Windows 11 with WSL2
+### 2.3 Continue to the shared installation
 
-### Prerequisites
+Skip the macOS section and continue at **Section 4** in the Ubuntu terminal.
+Systemd is not required for the foreground demonstration described here.
 
-1. Enable WSL2 and install a supported Ubuntu LTS distribution from an elevated
-   PowerShell session. Reboot if Windows requests it.
-2. Enable systemd for the distribution.
-3. Inside WSL, install Git, CA certificates, Python 3, and the standard C/C++
-   build toolchain.
-4. Install the Node.js version from the repository's future `.node-version`, then
-   enable Corepack.
-5. Install Caddy or configure the existing local reverse proxy/tunnel.
+## 3. macOS: install native prerequisites
 
-Exact copy-and-paste commands must be added and tested after the Node version,
-Ubuntu LTS baseline, proxy, and tunnel provider are fixed. Do not tell operators
-to run a floating `curl | sh` installer without documenting its source and
-verification.
+### 3.1 Open Terminal and install Apple Command Line Tools
 
-### Filesystem
+Open **Applications → Utilities → Terminal**, then run:
 
-- Clone the repository under the WSL home directory, for example
-  `~/src/newcredit`, not under `/mnt/c`.
-- Default runtime data to `~/.local/share/newcredit`.
-- Default configuration to `~/.config/newcredit`.
-- Keep the SQLite database, `-wal` and `-shm` files, uploads, temporary processing
-  files, and active backups on the WSL Linux filesystem.
-- Copy only a completed backup archive to Windows storage.
+```bash
+xcode-select --install
+```
 
-### Supervision and startup
+Complete the Apple installation dialog before continuing. If the tools are
+already installed, macOS may report that instead; it is not a failure.
 
-- Install separate systemd units for API and worker, plus the selected proxy or
-  tunnel where appropriate.
-- Use a target unit so start, stop, and status operate on the full application.
-- Configure a Windows Scheduled Task to start the WSL distribution and target
-  after reboot when unattended operation is required.
-- Run services as an unprivileged Linux user with explicit working, data, and
-  configuration directories.
+```bash
+xcode-select -p
+git --version
+curl --version
+sqlite3 --version
+uname -m
+```
 
-## 6. Native macOS
+Apple Silicon normally reports `arm64`; Intel reports `x86_64`. Use a native
+Terminal session, not a Rosetta-translated session, so Node and native SQLite
+dependencies have matching architectures.
 
-### Prerequisites
+Python is optional for running the app on macOS if a SQLite prebuilt binary is
+available, but is needed for native compilation and document generation. Check:
 
-1. Install Apple Command Line Tools for Git and native package compilation.
-2. Install the Node.js version from the repository's future `.node-version`, then
-   enable Corepack.
-3. Install Caddy or configure the existing local reverse proxy/tunnel.
+```bash
+python3 --version
+```
 
-Homebrew may be used for operator-managed prerequisites, but application package
-installation remains pnpm-based. Exact copy-and-paste commands must be added and
-tested on the oldest supported macOS version after runtime versions and proxy
-provider are fixed.
+If missing, install Python 3 using the official macOS installer at
+[python.org/downloads/macos](https://www.python.org/downloads/macos/), reopen
+Terminal, and check again. No Homebrew installation is required by this guide.
 
-### Filesystem
+## 4. Shared installation — Ubuntu or macOS terminal
 
-- The Git checkout may live in the normal user workspace.
-- Default runtime data to `~/Library/Application Support/NewCredit`.
-- Keep configuration, database, WAL files, uploads, and processing files out of
-  the Git checkout and iCloud-synchronised folders.
-- Write completed backups to an operator-selected local path before copying them
-  to other approved storage.
+### 4.1 Clone the repository
 
-### Supervision and startup
+```bash
+mkdir -p "$HOME/src"
+cd "$HOME/src"
+git clone https://github.com/mcclellann/newcredit.git
+cd "$HOME/src/newcredit"
+git status --short --branch
+git rev-parse HEAD
+```
 
-- Install separate launchd property lists for API and worker, and for the proxy
-  or tunnel when it is application-managed.
-- Run as the logged-in service user without root privileges.
-- Set explicit working, data, configuration, and log paths.
-- Use launchd restart policies for unexpected failure; do not daemonize Node.js
-  processes inside the service.
+The final command records the exact revision you installed. If GitHub asks for
+credentials, use your organisation's approved GitHub authentication method.
+GitHub account passwords do not authenticate HTTPS Git operations. Do not put
+tokens into command examples, remote URLs, or configuration committed to Git.
 
-## 7. Shared configuration
+If you already have the checkout, do not clone over it. Open that checkout and
+inspect `git status` first; see the update instructions in Section 9.
 
-At minimum, runtime configuration will include:
+### 4.2 Install a Node version manager
 
-| Setting | Purpose |
-| --- | --- |
-| `NEWCREDIT_HOST` | Must default to `127.0.0.1` |
-| `NEWCREDIT_PORT` | Loopback API port |
-| `NEWCREDIT_PUBLIC_ORIGIN` | Exact proxy/tunnel HTTPS origin |
-| `NEWCREDIT_DATA_DIR` | Platform-specific persistent data directory |
-| `NEWCREDIT_DATABASE_PATH` | SQLite path below the data directory |
-| `NEWCREDIT_UPLOAD_DIR` | Synthetic upload storage below the data directory |
-| `NEWCREDIT_LOG_LEVEL` | Structured logging level without document content |
+This guide uses [nvm](https://github.com/nvm-sh/nvm) from its official repository,
+pinned to tag `v0.40.3`, rather than piping a floating download into a shell.
+The commands execute code from that repository; inspect it or use your approved
+Node installation method if your organisation requires additional verification.
+The Git tag is a version pin, not an independently verified signature.
 
-Secrets, proxy credentials, and tunnel tokens are entered on the target machine
-and never committed. Startup must fail clearly when a required setting is absent
-or a data directory is unsafe or unwritable.
+If nvm is **not already installed**:
 
-## 8. Reverse proxy contract
+```bash
+git clone --branch v0.40.3 --depth 1 https://github.com/nvm-sh/nvm.git "$HOME/.nvm"
+export NVM_DIR="$HOME/.nvm"
+. "$NVM_DIR/nvm.sh"
+nvm --version
+```
 
-The local proxy must:
+If `~/.nvm` already exists, do not delete it or clone over it. Load the existing
+installation instead:
 
-- serve the built React files and SPA fallback;
-- proxy `/api/*` to Fastify on loopback without rewriting `/api/v1` semantics;
-- set forwarded headers consistently;
-- impose upload body and request time limits compatible with documented file
-  limits;
-- pass a request identifier or allow Fastify to generate one;
-- expose no directory listing or runtime data path; and
-- forward only the health endpoint needed by the selected tunnel monitor.
+```bash
+export NVM_DIR="$HOME/.nvm"
+. "$NVM_DIR/nvm.sh"
+nvm --version
+```
 
-Fastify trusts forwarded headers only from the configured local proxy hop. CORS
-remains same-origin by default. External TLS and audience access policy belong at
-the trusted proxy/tunnel boundary.
+For automatic loading in future terminals, add these lines **once** to
+`~/.bashrc` on Ubuntu, or `~/.zshrc` for the default macOS shell:
 
-## 9. Installation sequence after implementation
+```bash
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+```
 
-The final operator guide must provide this sequence for each target:
+You can edit the appropriate file with `nano ~/.bashrc` or `nano ~/.zshrc`.
+In nano, save with Ctrl+O, press Enter, then exit with Ctrl+X. Reopen Terminal
+after editing, or run the loading commands above in the current terminal.
 
-1. install and verify platform prerequisites;
-2. clone or update an explicitly identified release revision;
-3. install the pinned Node.js version and enable Corepack;
-4. install dependencies from the frozen lockfile;
-5. create runtime directories and configuration with restrictive permissions;
-6. build the application;
-7. back up any existing deployment;
-8. run database migrations;
-9. seed synthetic data only on a new or explicitly reset demonstration;
-10. install or update supervised services and proxy configuration;
-11. start API and worker;
-12. verify readiness through the proxy origin; and
-13. exercise one synthetic application without accessing a direct service port.
+### 4.3 Install Node 24 and activate the pinned pnpm
 
-Upgrade and rollback instructions must identify whether a database migration is
-backward compatible. Rollback never restores an old binary against an
-incompatible newer database; restore the matching verified backup when required.
+Run from the repository root:
 
-## 10. Acceptance checks
+```bash
+cd "$HOME/src/newcredit"
+nvm install
+nvm use
+node --version
+npm install --global corepack
+corepack enable
+pnpm --version
+```
 
-Installation is not complete until both a clean Windows/WSL2 host and a clean
-supported macOS host can demonstrate:
+`nvm install` reads `.nvmrc` (`24`) and installs the latest available Node 24
+patch. Expect `node --version` to start with `v24.`. The exact package manager
+is pinned by `package.json`; expect `pnpm --version` to print `12.0.0`.
+Corepack may ask permission to download that version the first time.
 
-- dependency installation from the committed lockfile;
-- build, migration, and idempotent synthetic seed;
-- automatic API and worker startup after host reboot;
-- same-origin web and API access through the configured proxy/tunnel;
-- no listener exposed beyond the intended local proxy;
-- successful liveness and readiness checks;
-- one complete new- or existing-customer synthetic journey;
-- clean stop and restart with application state retained;
-- consistent backup and test restore; and
-- no credentials, database, uploads, or generated runtime files in Git status.
+Installing Corepack globally here is within your nvm-managed Node installation;
+do not prefix these commands with `sudo`. If you already manage Corepack through
+an approved toolchain, use that installation rather than replacing it.
 
-The implementation task must replace all future-tense placeholders in this guide
-with tested commands, supported versions, service files, and troubleshooting
-steps before deployment is declared ready.
+### 4.4 Install the application dependencies
+
+```bash
+pnpm install --frozen-lockfile
+```
+
+Wait for a successful exit. Native SQLite installation may take longer than the
+other packages. Keep `--frozen-lockfile`: it installs the versions recorded in
+the repository without silently changing the dependency selection.
+
+You do not need to regenerate PDFs to run the demo: synthetic documents are
+already included in the repository.
+
+## 5. Create persistent local configuration
+
+These examples use `runtime/` under the checkout for a simple demo installation.
+It is ignored by Git. Do not remove it when updating: it holds your synthetic
+applications, uploaded files, and local backups.
+
+Run from `~/src/newcredit`:
+
+```bash
+umask 077
+mkdir -p runtime/uploads runtime/backups
+cat > runtime/demo.env <<EOF
+export HOST=127.0.0.1
+export PORT=3001
+export DATABASE_URL="$PWD/runtime/newcredit.sqlite"
+export NEWCREDIT_UPLOAD_DIR="$PWD/runtime/uploads"
+EOF
+chmod 600 runtime/demo.env
+. ./runtime/demo.env
+```
+
+This creates or replaces only `runtime/demo.env`, not the database. Paths are
+absolute and quoted, so a checkout path containing spaces is supported. If you
+move the checkout, recreate this file with the new paths.
+
+**Important:** copying `.env.example` to `.env` does not automatically configure
+the API. It reads `process.env`, and the current startup scripts do not load
+`.env`. Source the trusted local file with `. ./runtime/demo.env` in **every
+terminal** where you run migrations or the API. Sourcing executes shell code;
+do not source files from untrusted sources.
+
+### Configuration reference — currently implemented names
+
+| Variable | Meaning | Value used here |
+| --- | --- | --- |
+| `HOST` | Fastify bind address | `127.0.0.1` |
+| `PORT` | Fastify port | `3001` |
+| `DATABASE_URL` | SQLite file path, not a network URL | Absolute `runtime/newcredit.sqlite` path |
+| `NEWCREDIT_UPLOAD_DIR` | Persisted synthetic document directory | Absolute `runtime/uploads` path |
+| `CORS_ORIGIN` | Optional comma-separated additional allowed API origins | Unset for same-origin Vite proxy |
+| `VITE_API_URL` | Optional separate API base origin at web build/dev time | Unset for same-origin Vite proxy |
+
+Do not substitute proposed names such as `NEWCREDIT_HOST` or
+`NEWCREDIT_DATABASE_PATH`: the current server does not read them. `HOST` must be
+set explicitly because the server otherwise binds to `0.0.0.0`.
+
+For a managed installation, keep data outside the checkout, conventionally
+`~/.local/share/newcredit` on WSL or `~/Library/Application Support/NewCredit`
+on macOS. Create the directory and point both paths at it; retain the quoting
+around macOS paths containing spaces. The remainder of this walkthrough assumes
+the simpler `runtime/` layout above.
+
+## 6. Check the build and initialise SQLite
+
+```bash
+cd "$HOME/src/newcredit"
+nvm use
+. ./runtime/demo.env
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm db:migrate
+sqlite3 "$DATABASE_URL" 'PRAGMA user_version; PRAGMA integrity_check;'
+```
+
+Run each command successfully before continuing. Expected results:
+
+- Typecheck and build exit without errors.
+- The current test suite reports 18 passing tests across the web, API, and domain
+  packages. Future revisions may add tests.
+- Migration prints `Database migrations are up to date.`
+- SQLite currently reports schema version `4`, then `ok`.
+
+Migrations are safe to rerun; they apply only outstanding schema versions. There
+is no separate seed command: the scenario fixtures are loaded when you create
+an application through the UI.
+
+## 7. Start the demonstration using two terminals
+
+Keep both terminals open while demonstrating. These foreground processes do not
+automatically survive logout, reboot, closing Terminal, or WSL shutdown.
+
+### Terminal 1 — API
+
+```bash
+cd "$HOME/src/newcredit"
+nvm use
+. ./runtime/demo.env
+pnpm --filter @newcredit/api dev
+```
+
+This checks migrations and starts the API watcher. It may be quiet after the
+migration message; use the health check below instead of assuming it failed.
+
+### Terminal 2 — web interface
+
+Open another Ubuntu terminal on Windows, or another Terminal tab on macOS:
+
+```bash
+cd "$HOME/src/newcredit"
+nvm use
+pnpm --filter @newcredit/web exec vite --host 127.0.0.1 --port 5173 --strictPort
+```
+
+Expect Vite to print a local address using port `5173`. The explicit host keeps
+the web service on loopback, and `--strictPort` prevents it silently choosing
+another port. The web server proxies `/api` to `127.0.0.1:3001`.
+
+The shorter `pnpm dev` command exists, but this guide uses separate terminals to
+make logs and shutdown clearer and explicitly override Vite's default
+`0.0.0.0` listener. Avoid `pnpm dev` if you require both listeners to stay on
+loopback with the current repository defaults.
+
+### Terminal 3 — verify health and open a browser
+
+```bash
+curl --fail --show-error http://127.0.0.1:3001/health
+curl --fail --show-error --output /dev/null http://127.0.0.1:5173/
+curl --fail --show-error http://127.0.0.1:5173/api/v1/demo-scenarios
+```
+
+The health response should be `{"status":"ok"}`. The second command should
+exit successfully, and the third should return scenarios A, B, C, and H.
+
+On **macOS**, open the web page from Terminal:
+
+```bash
+open http://127.0.0.1:5173
+```
+
+On **Windows**, type `http://localhost:5173` into your Windows browser. WSL2
+normally forwards localhost access to the Linux service. If the Ubuntu curl
+checks pass but your Windows browser cannot connect, see Section 11.
+
+These addresses are for a demo running on your own Windows/Mac machine. They
+are not URLs for accessing an Amp orb from your machine; use the orb's supplied
+portal instead when reviewing an Amp-hosted preview.
+
+### Walk through the app
+
+1. Choose **New customer** for the Avery approval journey.
+2. Download the synthetic test ZIP and extract it using Explorer or Finder.
+3. At identity, choose `drivers-licence.pdf` and upload/process it.
+4. Confirm the identity fields appear and the payslip stage unlocks.
+5. Select the four `payslip-*.pdf` files together and upload/process them.
+6. Confirm extracted pay and arithmetic checks appear.
+7. Select the three `bank-statement-*.pdf` files and upload/process them.
+8. Review balances and classified-transaction output, then continue to review.
+9. Submit, inspect the indicative outcome, and optionally exercise the simulated
+   offer/funding journey. No real money moves.
+
+Other examples: Morgan is referred; Casey surfaces an unreadable licence and
+missing statement progressively and cannot submit; Taylor is not approved and
+has no offer or funding. Use each applicant's own ZIP, not another scenario's
+documents. Unknown or modified files are deliberately rejected.
+
+### Stop and start again
+
+Press **Ctrl+C** in Terminal 2 and Terminal 1. Start them again with the same
+commands when needed. Reuse `runtime/demo.env` and the existing database;
+do not reinstall dependencies each time. Saved application URLs can be reopened
+after restart using the same local origin, and persisted upload progress resumes.
+
+## 8. Optional document-generation tooling
+
+Skip this section unless you intend to edit or regenerate synthetic PDFs.
+Python document tooling is separate from the application runtime:
+
+```bash
+cd "$HOME/src/newcredit"
+python3 -m venv runtime/document-tools
+runtime/document-tools/bin/python -m pip install -r requirements-docs.txt
+```
+
+The virtual environment stays in the Git-ignored `runtime/` directory. Read the generator
+and synthetic-data policy before running generation: regenerated files can
+change the approved document hashes, fixtures, and demo results. A plain install
+does not require executing `scripts/generate-synthetic-documents.py`.
+
+## 9. Updates, backups, and rollback
+
+### 9.1 Stop and back up before updating
+
+Stop both servers using Ctrl+C, then run from the repository root:
+
+```bash
+. ./runtime/demo.env
+backup_dir="$PWD/runtime/backups/$(date +%Y%m%d-%H%M%S)"
+mkdir -p "$backup_dir"
+sqlite3 "$DATABASE_URL" ".backup '$backup_dir/newcredit.sqlite'"
+cp -R "$NEWCREDIT_UPLOAD_DIR" "$backup_dir/uploads"
+git rev-parse HEAD > "$backup_dir/revision.txt"
+sqlite3 "$backup_dir/newcredit.sqlite" 'PRAGMA integrity_check;'
+```
+
+Expect `ok`. Keep the database and uploaded-file backup together. SQLite's
+backup command creates a consistent database copy; do not copy only the live
+`.sqlite` file while ignoring its WAL. Protect backups as local runtime data.
+
+### 9.2 Update a clean checkout
+
+```bash
+git status --short --branch
+```
+
+If you have local edits, stop and preserve them before updating; do not discard
+them to make these commands work. With a clean checkout:
+
+```bash
+git pull --ff-only origin main
+nvm install
+nvm use
+corepack enable
+pnpm install --frozen-lockfile
+pnpm typecheck
+pnpm test
+pnpm build
+. ./runtime/demo.env
+pnpm db:migrate
+```
+
+Then restart both terminals as in Section 7. Record `git rev-parse HEAD` again.
+For a controlled release, use an owner-approved tag or revision rather than
+following a moving `main` branch.
+
+### 9.3 Rollback safety
+
+Do not run an older application against a newer incompatible schema. Stop both
+servers, retain the failed deployment and runtime data, and restore a matched
+code revision, database backup, and uploads into a separate installation first.
+Verify integrity and a synthetic journey before switching back. There is no
+automated downgrade/restore command; seek the maintainer's migration guidance
+before replacing existing runtime files.
+
+## 10. Remote access without a public IP — deployment planning
+
+The intended deployment uses an outbound tunnel/proxy; it does not require router
+port forwarding or a public IP on your Windows/Mac machine:
+
+```text
+Viewer → authenticated HTTPS tunnel → local reverse proxy
+                                      ├─ React static files + SPA fallback
+                                      └─ /api/* → loopback Fastify → SQLite/files
+```
+
+The current demo processes documents in the API; there is no separate worker
+service to install. Caddy is the preferred future local reverse proxy, but this
+repository does not yet provide its configuration or select a tunnel provider.
+Do not expose the Vite dev server, simulated login, or document API directly to
+the public Internet as a substitute for that work.
+
+Before remote/unattended deployment is called ready, supply and validate:
+
+- same-origin web/API routing, SPA fallback, and HTTPS;
+- audience authentication/access controls at the trusted tunnel boundary;
+- only loopback API listeners and no runtime directory served over HTTP;
+- upload limits compatible with 20 MiB per file, request timeouts, and a precise
+  forwarded-header trust policy;
+- a verified API production command and packaged fixture/migration paths—do not
+  assume `pnpm build` alone creates a self-contained deployable bundle;
+- systemd services on WSL or launchd services on macOS, unprivileged execution,
+  log locations, restart policy, and tested reboot behaviour;
+- a Windows startup mechanism for the WSL distribution when unattended;
+- backup, restore, upgrade, rollback, and end-to-end checks on both target hosts.
+
+Tunnel tokens and credentials belong on the target host, never in Git.
+
+## 11. Troubleshooting with example commands
+
+### `nvm`, `node`, `corepack`, or `pnpm`: command not found
+
+Load nvm in this terminal and select the repository version:
+
+```bash
+export NVM_DIR="$HOME/.nvm"
+. "$NVM_DIR/nvm.sh"
+cd "$HOME/src/newcredit"
+nvm use
+node --version
+corepack enable
+pnpm --version
+```
+
+If Corepack itself is missing, install it with `npm install --global corepack`
+using the nvm-managed Node. Do not solve permission errors by running pnpm as root.
+
+### Native SQLite dependency will not install
+
+First check architecture and toolchain:
+
+```bash
+node --version
+node -p 'process.platform + " " + process.arch'
+python3 --version
+```
+
+On Ubuntu, verify `build-essential` is installed; on macOS, run
+`xcode-select -p`. Read the first compiler/install error before retrying
+`pnpm install --frozen-lockfile`. Do not copy `node_modules` between Windows,
+WSL, Intel macOS, and Apple Silicon; native binaries are platform-specific.
+Do not delete or regenerate `pnpm-lock.yaml` to hide an install error.
+
+### `EADDRINUSE` or Vite says port 5173 is occupied
+
+Inspect listeners instead of terminating an unknown process:
+
+Ubuntu:
+
+```bash
+ss -ltnp | grep -E ':3001|:5173'
+```
+
+macOS:
+
+```bash
+lsof -nP -iTCP:3001 -sTCP:LISTEN
+lsof -nP -iTCP:5173 -sTCP:LISTEN
+```
+
+Stop your previous demo with Ctrl+C. Keep API port `3001` unless you also update
+Vite's configured proxy target. Changing only `PORT` leaves the web proxy pointing
+at the old API port.
+
+### Database directory does not exist, or progress disappears on restart
+
+Check that you are in the correct checkout and loaded the same configuration:
+
+```bash
+pwd
+. ./runtime/demo.env
+printf 'Database: %s\nUploads: %s\n' "$DATABASE_URL" "$NEWCREDIT_UPLOAD_DIR"
+ls -ld runtime runtime/uploads
+pnpm db:migrate
+```
+
+Without `DATABASE_URL`, the API falls back to a relative `newcredit.sqlite`.
+Do not assume that is the database created by these instructions. Stop the API,
+load the absolute paths, and start it again. Do not delete unfamiliar databases.
+
+### The UI loads but API calls fail
+
+```bash
+curl --fail --show-error http://127.0.0.1:3001/health
+curl --fail --show-error http://127.0.0.1:5173/api/v1/demo-scenarios
+```
+
+If the first fails, check Terminal 1. If only the second fails, check Terminal 2
+and confirm the API still uses port `3001`. Leave `VITE_API_URL` unset for this
+same-origin setup. Do not add wildcard CORS as a workaround.
+
+### Windows browser cannot reach WSL, but Ubuntu curl works
+
+Confirm the two curl checks above work inside Ubuntu. From Windows PowerShell:
+
+```powershell
+wsl --list --verbose
+Test-NetConnection -ComputerName localhost -Port 5173
+```
+
+Check Windows VPN, firewall, WSL localhost-forwarding settings, and your
+organisation's network policy. If instructed to restart WSL, stop the demo first:
+
+```powershell
+wsl --shutdown
+```
+
+This stops **all running WSL distributions and their processes**, not just this
+demo. Reopen Ubuntu and restart both services afterwards. Do not open firewall
+ports or bind to `0.0.0.0` as an unexplained workaround.
+
+### Upload rejected, or the next step stays locked
+
+- Extract the ZIP first; upload PDFs, not the ZIP itself.
+- Use the current applicant's pack and the correct files for the active stage.
+- Select the displayed remaining file count. Duplicate files do not fill a
+  missing requirement.
+- PDF, JPEG, and PNG uploads are accepted up to 20 MiB, but this deterministic
+  demo recognises only its approved synthetic bytes.
+- Read the per-file error, choose the remaining correct files, and retry.
+- A Casey licence may be processed but still need review; this is deliberate.
+  Submission and assessment remain withheld until the fixture blockers resolve.
+
+### What to include in a support report
+
+Include your OS/version, CPU architecture, `node --version`, `pnpm --version`,
+`git rev-parse HEAD`, which step failed, and the relevant error text. Never send
+tokens, passwords, environment dumps, real documents, or private runtime data.

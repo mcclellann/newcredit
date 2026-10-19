@@ -14,18 +14,32 @@ and cannot create an offer or funds movement.
 
 ## Run locally
 
-Requires Node.js 24 and pnpm 12.
+Start with the [step-by-step installation guide](docs/install-and-deployment.md)
+for Windows/WSL2 or macOS. It includes prerequisite installation, copy-and-paste
+commands, expected output, backups, and troubleshooting. The commands below are
+a short reference for an already prepared machine with Node.js 24 and pnpm 12.
 
 ```sh
 corepack enable
 pnpm install --frozen-lockfile
 mkdir -p runtime/uploads
-DATABASE_URL="$PWD/runtime/newcredit.sqlite" pnpm db:migrate
-DATABASE_URL="$PWD/runtime/newcredit.sqlite" NEWCREDIT_UPLOAD_DIR="$PWD/runtime/uploads" pnpm dev
+export HOST=127.0.0.1
+export DATABASE_URL="$PWD/runtime/newcredit.sqlite"
+export NEWCREDIT_UPLOAD_DIR="$PWD/runtime/uploads"
+pnpm db:migrate
+pnpm --filter @newcredit/api dev
+```
+
+In a second terminal at the repository root:
+
+```sh
+pnpm --filter @newcredit/web exec vite --host 127.0.0.1 --port 5173 --strictPort
 ```
 
 The web app runs at `http://localhost:5173` and proxies `/api` to the API on
-`http://127.0.0.1:3001`. All application records and documents are synthetic.
+`http://127.0.0.1:3001`. Both commands stay in the foreground; stop them with
+Ctrl+C. All application records and documents are synthetic. This runs the
+development demo, not an unattended production deployment.
 
 Useful checks:
 
