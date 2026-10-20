@@ -97,6 +97,49 @@ it('extracts altered PDF bytes, confirms unknown living costs, and varies afford
   expect(outcomes[0].monthlySurplus.amountMinor).toBeGreaterThan(outcomes[1].monthlySurplus.amountMinor)
 })
 
+it('prefills statement-derived figures for validation without overwriting saved customer corrections', async () => {
+  app = await buildApp({ databaseUrl: ':memory:', migrate: true })
+  const { id } = await create()
+  const fixture = await pack(id)
+  const filled = await get(id)
+  // Source statements: non-housing spending 5,597.68 / 3, rent 4,200 / 3;
+  // category-level rounding rounds each monthly subtotal up to a whole cent.
+  expect(filled.declarations).toMatchObject({ declaredLivingMinor: 186590, declaredHousingMinor: 140000, declaredDebtRepaymentsMinor: 0, assetsMinor: 1063349, liabilitiesMinor: 0, confirmed: false })
+  expect(filled.review.assessedLivingExpenses.amountMinor).toBe(204932)
+  expect(filled.customer.email).toBe('')
+  expect(filled.loan.purposeDetail).toBe('')
+  await withheld(id)
+
+  const september = fixture.documents.find((d: any) => d.file.endsWith('bank-statement-2026-09.pdf'))
+  const stored = (await app.inject(url(id, '/documents'))).json().documents.find((d: any) => d.originalName === 'arbitrary.pdf' && d.periodEnd === '2026-09-30' && d.type === 'bank_statement')
+  await app.inject({ method: 'DELETE', url: url(id, `/documents/${stored.id}`) })
+  expect((await get(id)).declarations.assetsMinor).toBe(803340)
+  await upload(id, september); await stage(id, 'bank_statement')
+  expect((await get(id)).declarations.assetsMinor).toBe(1063349)
+
+  const body = await details(id)
+  Object.assign(body.declarations, { declaredLivingMinor: 0, declaredHousingMinor: 98765, declaredDebtRepaymentsMinor: 4321, assetsMinor: 123456, liabilitiesMinor: 456789 })
+  await confirm(id, body)
+  // Zero is a valid customer correction, not an unfilled field. New uploads must
+  // invalidate consent but must not replace any previously saved declarations.
+  await upload(id, { document_type: 'payslip', bytes: blankPdf() })
+  await stage(id, 'payslip')
+  const corrected = await get(id)
+  expect(corrected.declarations).toMatchObject({ ...body.declarations, confirmed: false })
+  expect(corrected.review.assessedLivingExpenses.amountMinor).toBe(204932)
+  expect(corrected.review.monthlyHousing.amountMinor).toBe(140000)
+
+  const overdrawn = await create()
+  const h = await loadScenarioDocumentData('scenario-h')
+  for (const type of ['drivers_licence', 'payslip', 'bank_statement']) {
+    for (const document of h.documents.filter((d: any) => d.document_type === type)) await upload(overdrawn.id, document)
+    await stage(overdrawn.id, type)
+  }
+  // The latest statement closes at -$500: a liability, never a negative asset
+  // or a sum of all three historical closing balances.
+  expect((await get(overdrawn.id)).declarations).toMatchObject({ assetsMinor: 0, liabilitiesMinor: 50000, confirmed: false })
+})
+
 it('persists evidence and idempotent submission, acceptance and funding across restart', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'newcredit-contract-')); temporary.push(dir)
   const databaseUrl = join(dir, 'api.sqlite')

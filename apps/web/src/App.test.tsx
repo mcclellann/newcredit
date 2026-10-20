@@ -64,7 +64,7 @@ it('accepts arbitrary stage counts, continues through review issues, saves decla
     }
     if (url.includes('/document-processing?')) {
       const type = new URL(url, 'https://test').searchParams.get('documentType')
-      app = { ...app, status: 'needs_review', documents: app.documents.map(d => d.type === type ? { ...d, status: 'needs_review' } : d), transactions: [{ id: 'tx', documentId: 'doc-3', date: '2026-09-01', description: 'Unknown purchase', amountMinor: -1234, balanceMinor: 60000, account: 'Synthetic account', category: 'unclassified_debit' }] }; return json(app)
+      app = { ...app, status: 'needs_review', customer: { ...app.customer, name: 'Taylor Extracted', employer: 'Document Employer' }, declarations: { adults: 1, dependants: 0, inWorkforce: false, declaredLivingMinor: 186590, declaredHousingMinor: 140000, declaredDebtRepaymentsMinor: 12345, assetsMinor: 1063349, liabilitiesMinor: 40000, otherCommitmentsMinor: 0, confirmed: false, allAccountsConfirmed: false, incomeContinuing: false, foreseeableChanges: '', classifications: {} }, documents: app.documents.map(d => d.type === type ? { ...d, status: 'needs_review' } : d), transactions: [{ id: 'tx', documentId: 'doc-3', date: '2026-09-01', description: 'Unknown purchase', amountMinor: -1234, balanceMinor: 60000, account: 'Synthetic account', category: 'unclassified_debit' }] }; return json(app)
     }
     if (url.endsWith('/details')) {
       saved = JSON.parse(String(init?.body)); app = { ...app, status: 'ready_to_submit', declarations: saved!.declarations }; return json(app)
@@ -92,6 +92,14 @@ it('accepts arbitrary stage counts, continues through review issues, saves decla
   expect(await screen.findByRole('heading', { name: 'Check your application' })).toBeInTheDocument()
   expect(uploads).toHaveLength(7)
   expect(screen.getByText(/Supply complete periods\./)).toBeInTheDocument()
+  expect(screen.getByText('Taylor Extracted')).toBeInTheDocument()
+  expect(screen.getByText('Document Employer')).toBeInTheDocument()
+  expect(screen.getByLabelText('Monthly living expenses ($)')).toHaveValue(1865.9)
+  expect(screen.getByLabelText('Monthly housing costs ($)')).toHaveValue(1400)
+  expect(screen.getByLabelText('Monthly debt repayments ($)')).toHaveValue(123.45)
+  expect(screen.getByLabelText('Assets ($)')).toHaveValue(10633.49)
+  expect(screen.getByLabelText('Liabilities ($)')).toHaveValue(400)
+  expect(screen.getByLabelText('Email')).toHaveValue('')
   const applicantConsent = screen.getByLabelText(/I explicitly confirm/i)
   expect(applicantConsent).not.toBeChecked()
   fireEvent.change(screen.getByLabelText('Loan amount ($)'), { target: { value: '17000' } })
@@ -108,6 +116,7 @@ it('accepts arbitrary stage counts, continues through review issues, saves decla
   fireEvent.click(screen.getByRole('button', { name: /save details/i }))
   await waitFor(() => expect(saved?.declarations.confirmed).toBe(true))
   expect(saved?.declarations.classifications).toEqual({ tx: 'living' })
+  expect(saved?.declarations).toMatchObject({ declaredLivingMinor: 186590, declaredHousingMinor: 140000, declaredDebtRepaymentsMinor: 12345, assetsMinor: 1063349, liabilitiesMinor: 40000 })
   expect(saved?.loan).toEqual({ amountMinor: 1700000, termYears: 3, purposeDetail: 'Synthetic repairs' })
   const submit = screen.getByRole('button', { name: /submit for/i })
   expect(submit).toBeDisabled()

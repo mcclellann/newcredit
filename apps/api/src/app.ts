@@ -178,9 +178,10 @@ export async function buildApp(options: BuildAppOptions = {}) {
     const { sequence } = db.prepare('SELECT COALESCE(MAX(sequence), 0) + 1 sequence FROM application_audit_events WHERE application_id = ?').get(id) as { sequence: number }
     db.prepare('INSERT INTO application_audit_events (id, application_id, sequence, type, at, details) VALUES (?, ?, ?, ?, ?, ?)').run(randomUUID(), id, sequence, type, now(), JSON.stringify(details))
   }
+  const hasSavedDetails = (id: string) => Boolean(db.prepare("SELECT 1 FROM application_audit_events WHERE application_id = ? AND type = 'applicant_details_confirmed' LIMIT 1").get(id))
   function rebuild(application: DemoApplication) {
     application.documents = documentRows(application.id).map(d => ({ id: d.id, type: d.type, issuer: d.issuer, periodStart: d.periodStart, periodEnd: d.periodEnd, status: d.status }))
-    const result = assembleEvidence(application, evidence(application.id))
+    const result = assembleEvidence(application, evidence(application.id), !hasSavedDetails(application.id))
     if (application.documents.some(d => d.status === 'uploaded')) { result.issues.push('Process all uploaded documents before submission.'); application.status = 'needs_review' }
     application.version += 1
     db.prepare('DELETE FROM document_checks WHERE application_id = ? AND document_id IS NULL').run(application.id)
@@ -217,7 +218,16 @@ export async function buildApp(options: BuildAppOptions = {}) {
 
   app.get('/api/v1/applications/:id', { schema: { tags: ['applications'], params: Id, response: { 200: ApplicationSchema } } }, async (request) => {
     const { id } = request.params as { id: string }
-    return parse<DemoApplication>(getApplicationRow(id).snapshot as string)
+    const row = getApplicationRow(id)
+    const application = parse<DemoApplication>(row.snapshot as string)
+    // Also fill existing unsaved drafts created before pre-population was added,
+    // without writing on GET or changing their stored lifecycle/version.
+    if (row.scenario_id === 'document-driven' && ['documents_required', 'needs_review', 'ready_to_submit'].includes(row.status as string) && !hasSavedDetails(id)) {
+      const status = application.status
+      assembleEvidence(application, evidence(id), true)
+      application.status = status
+    }
+    return application
   })
 
   app.get('/api/v1/applications/:id/documents', { schema: { tags: ['documents'], params: Id, response: { 200: Type.Object({ documents: Type.Array(StoredDocumentSchema) }) } } }, async (request) => {
@@ -326,8 +336,8 @@ export async function buildApp(options: BuildAppOptions = {}) {
     application.loan = { ...application.loan, amount: { amountMinor: body.loan.amountMinor, currency: 'AUD' }, termYears: body.loan.termYears, purposeDetail: body.loan.purposeDetail.trim() }
     application.customer = { ...application.customer, ...body.customer }
     application.declarations = body.declarations
-    const result = rebuild(application)
     audit(id, 'applicant_details_confirmed', { before, after: body })
+    const result = rebuild(application)
     return result.application
   })())
 

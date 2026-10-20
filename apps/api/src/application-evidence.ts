@@ -10,7 +10,7 @@ const iso = (ms: number) => new Date(ms).toISOString().slice(0, 10)
 const daily = 86400000
 
 /** Rebuild derived fields from stored extraction, never from a chosen sample pack. */
-export function assembleEvidence(application: DemoApplication, records: Evidence[]): { application: DemoApplication; issues: string[]; assessment: AssessmentResult | null } {
+export function assembleEvidence(application: DemoApplication, records: Evidence[], prefillDeclarations = false): { application: DemoApplication; issues: string[]; assessment: AssessmentResult | null } {
   const issues: string[] = []
   const licences = records.filter(r => r.parsed.type === 'drivers_licence')
   const payslips = records.filter(r => r.parsed.type === 'payslip')
@@ -58,10 +58,17 @@ export function assembleEvidence(application: DemoApplication, records: Evidence
   }
   application.accounts = [...accounts].map(([id, docs]) => ({ id, type: 'transaction', ownership: 'sole', applicantShare: 1, bsbMasked: docs[0]!.parsed.fields.bsb ?? '', accountMasked: docs[0]!.parsed.fields.account ?? '', active: true }))
   const transactions: Transaction[] = []
+  let bankAssetsMinor = 0; let bankLiabilitiesMinor = 0
   application.transactions = []
   for (const [account, docs] of accounts) {
     const covered = new Set<string>()
     const ordered = [...docs].sort((a, b) => (a.parsed.periodStart ?? '').localeCompare(b.parsed.periodStart ?? ''))
+    const latest = ordered.filter(r => !r.parsed.issues.length && r.parsed.periodEnd && r.parsed.periodEnd <= end).at(-1)
+    if (latest) {
+      const balance = cents(latest.parsed.fields.closing_balance)
+      bankAssetsMinor += Math.max(0, balance)
+      bankLiabilitiesMinor += Math.max(0, -balance)
+    }
     let previous: ParsedDocument | undefined
     for (const { id, parsed } of ordered) {
       if (parsed.periodStart && parsed.periodEnd) {
@@ -93,8 +100,23 @@ export function assembleEvidence(application: DemoApplication, records: Evidence
   if (declarations?.foreseeableChanges.trim() && declarations.foreseeableChanges.trim().toLowerCase() !== 'none') issues.push('Declared foreseeable changes require further review before an automated outcome.')
   if (!application.customer.email.trim() || !application.customer.phone.trim() || !application.loan.purposeDetail.trim()) issues.push('Supply contact details and a specific loan purpose.')
   let assessment: AssessmentResult | null = null
+  if (prefillDeclarations && declarations) {
+    // Derive fresh suggestions from evidence, not the previous suggestion or
+    // the living-expense benchmark. Saved customer declarations never enter here.
+    declarations.declaredLivingMinor = 0
+    declarations.declaredHousingMinor = 0
+    declarations.declaredDebtRepaymentsMinor = 0
+    declarations.assetsMinor = bankAssetsMinor
+    declarations.liabilitiesMinor = bankLiabilitiesMinor
+    application.financialPosition = { assetsTotal: money(bankAssetsMinor), liabilitiesTotal: money(bankLiabilitiesMinor), monthlyDebtRepayments: money(0) }
+  }
   if (statements.length && declarations) {
     assessment = assessApplication({ applicationId: application.id, principalMinor: application.loan.amount.amountMinor, termYears: application.loan.termYears, monthlyPayslipIncomeMinor, transactions, months: 3, ...declarations })
+    if (prefillDeclarations) {
+      declarations.declaredLivingMinor = assessment.observedExpenses.livingMinor
+      declarations.declaredHousingMinor = assessment.observedExpenses.housingMinor
+      declarations.declaredDebtRepaymentsMinor = assessment.observedExpenses.debtRepaymentsMinor
+    }
     application.transactions!.forEach((transaction, index) => { transaction.category = assessment!.categories[index]! })
     if (assessment.categories.some(category => category.startsWith('unclassified') || category === 'cash')) issues.push('Confirm a category for every unknown or cash transaction before submission.')
     const salary = transactions.filter(t => classifyTransaction(t) === 'salary').reduce((sum, t) => sum + t.amountMinor, 0) / 3

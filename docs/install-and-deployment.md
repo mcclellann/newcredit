@@ -379,9 +379,14 @@ portal instead when reviewing an Amp-hosted preview.
 6. Confirm categories for every unknown or cash transaction. Cash is not
    automatically gambling. Only matched transfers between uploaded accounts
    are excluded as internal transfers.
-7. Complete contact and specific loan-purpose details and confirm household,
-   expenses, commitments, assets/liabilities, continuing income and that all
-   accounts have been supplied. Foreseeable changes other than blank/“none”
+7. Validate the pre-filled applicant and financial information. Living costs,
+   housing and repayments use statement averages; assets use the latest positive
+   balance per account, and liabilities include observed overdrafts only. The
+   living-expense benchmark is assessed separately, not presented as extracted
+   spending. Correct amounts and add costs, other assets and loan/card balances
+   not shown in the documents. Saved corrections survive later uploads. Complete
+   contact and specific loan-purpose details, confirm household, continuing income
+   and that all accounts have been supplied. Foreseeable changes other than blank/“none”
    require review; salary credits and payslip income must reconcile within 20%.
 8. Resolve all evidence and declaration blockers before submitting. The result
    depends on documents and declarations, not pack choice. Scores are approximate

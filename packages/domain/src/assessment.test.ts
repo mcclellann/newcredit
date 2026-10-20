@@ -33,6 +33,7 @@ describe('transaction-driven assessment', () => {
       expect(assessApplication(input({ inWorkforce, adults, dependants })).review.assessedLivingExpenses.amountMinor).toBe(Math.round(amount * 100))
     })
     expect(assessApplication(input({ declaredLivingMinor: 321987 })).review.assessedLivingExpenses.amountMinor).toBe(321987)
+    expect(assessApplication(input({ declaredLivingMinor: 321987, declaredHousingMinor: 87654, declaredDebtRepaymentsMinor: 54321 })).observedExpenses).toEqual({ livingMinor: 100000, housingMinor: 0, debtRepaymentsMinor: 0 })
     expect(assessApplication(input({ dependants: 5 })).reviewReasons.join()).toContain('benchmark_unavailable')
   })
 

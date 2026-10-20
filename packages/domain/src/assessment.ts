@@ -10,6 +10,7 @@ export type AssessmentResult = {
   outcome: Outcome
   pricing: { annualRateBasisPoints: number; monthlyRepayment: Money; totalRepayable: Money }
   review: { monthlyNetIncome: Money; assessedLivingExpenses: Money; monthlyHousing: Money; classifiedTransactionCount: number; documentChecksPassed: number; transactionCategories: Array<{ category: string; count: number }> }
+  observedExpenses: { livingMinor: number; housingMinor: number; debtRepaymentsMinor: number }
   monthlyDebtRepaymentsMinor: number; reviewReasons: string[]; categories: string[]
 }
 
@@ -77,9 +78,10 @@ export function assessApplication(i: AssessmentInput): AssessmentResult {
   for (const c of ['cash', 'unclassified_debit', 'unclassified_credit']) if (monthly(c) >= 10000) reviewReasons.push(`Material ${c} requires explanation and classification`)
   const benchmark = benchmarks[i.inWorkforce ? 'working' : 'nonworking'][i.adults - 1]?.[i.dependants]
   if (benchmark === undefined) reviewReasons.push('benchmark_unavailable: unsupported household; no extrapolation')
-  const living = Math.max(i.declaredLivingMinor, benchmark ?? 0, monthly('living') + monthly('cash') + monthly('unclassified_debit') + monthly('gambling') + monthly('payment_stress'))
-  const housing = Math.max(i.declaredHousingMinor, monthly('housing'))
-  const debt = Math.max(i.declaredDebtRepaymentsMinor, monthly('debt') + monthly('short_term_credit'))
+  const observedExpenses = { livingMinor: monthly('living') + monthly('cash') + monthly('unclassified_debit') + monthly('gambling') + monthly('payment_stress'), housingMinor: monthly('housing'), debtRepaymentsMinor: monthly('debt') + monthly('short_term_credit') }
+  const living = Math.max(i.declaredLivingMinor, benchmark ?? 0, observedExpenses.livingMinor)
+  const housing = Math.max(i.declaredHousingMinor, observedExpenses.housingMinor)
+  const debt = Math.max(i.declaredDebtRepaymentsMinor, observedExpenses.debtRepaymentsMinor)
   const repayment = (bps: number) => {
     const r = bps / 120000
     return Math.ceil(i.principalMinor * r / (1 - (1 + r) ** (-i.termYears * 12))) + 1500
@@ -119,6 +121,6 @@ export function assessApplication(i: AssessmentInput): AssessmentResult {
     outcome: { applicationId: i.applicationId, decision: withheld ? 'referred' : surplus < 0 ? 'not_approved' : !affordable ? 'referred' : frozenScore >= 750 ? 'not_approved' : frozenScore >= 400 ? 'referred' : 'indicatively_approved', riskScore: withheld ? 0 : frozenScore, riskBand: frozenScore < 200 ? 'very_low' : frozenScore < 400 ? 'low' : frozenScore < 600 ? 'moderate' : frozenScore < 750 ? 'elevated' : frozenScore < 900 ? 'high' : 'severe', affordability: surplus < 0 ? 'unaffordable' : 'affordable', monthlySurplus: money(surplus), reasons, factors: withheld ? [] : factors.map(({ weight: _weight, ...f }) => f), illustrativeNotOffer: true },
     pricing: { annualRateBasisPoints: rate, monthlyRepayment: money(repayment(rate)), totalRepayable: money(repayment(rate) * i.termYears * 12) },
     review: { monthlyNetIncome: money(income), assessedLivingExpenses: money(living), monthlyHousing: money(housing), classifiedTransactionCount: categories.filter(c => !c.startsWith('unclassified')).length, documentChecksPassed: 0, transactionCategories: [...new Set(categories)].sort().map(category => ({ category, count: count(category) })) },
-    monthlyDebtRepaymentsMinor: debt, reviewReasons, categories,
+    observedExpenses, monthlyDebtRepaymentsMinor: debt, reviewReasons, categories,
   }
 }
